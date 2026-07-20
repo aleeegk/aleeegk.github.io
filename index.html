@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" data-orientation="vertical">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escala del Tiempo</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307070a'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%237fd8ff' stroke-width='2' stroke-linecap='round' opacity='0.4'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%237fd8ff'/%3E%3C/svg%3E">
+<meta name="description" content="Una línea del tiempo interactiva que pone en perspectiva un millón de años de historia, prehistoria y geología en un solo eje visual.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Fondo con viñeta dinámica -->
+  <div class="bg-vignette" id="bgVignette"></div>
+
+  <!-- Botón de Tema Flotante Global -->
+  <button class="floating-theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Cambiar tema claro/oscuro">
+    <span class="theme-icon theme-icon--sun">☀️</span>
+    <span class="theme-icon theme-icon--moon">🌙</span>
+  </button>
+
+
+
+  <!-- ======================================================
+       VISTA 1 · PRESENTACIÓN
+       ====================================================== -->
+  <section class="landing" id="landingView">
+    <div class="landing__inner">
+
+      <div class="landing__eyebrow" data-i18n-es="Antes de empezar" data-i18n-en="Before we start">Antes de empezar</div>
+      <h1 class="landing__title" data-i18n-es="Un millón de años,<br>una sola línea." data-i18n-en="One million years,<br>a single timeline.">
+        Un millón de años,<br>una sola línea.
+      </h1>
+      <p class="landing__lede" data-i18n-es="Escala del Tiempo pone la historia y la prehistoria en el mismo eje, para que puedas comparar cualquier año con cualquier otro y descubrir qué pasaba en el mundo en ese instante." data-i18n-en="Timeline Scale puts history and prehistory on the same axis, so you can compare any year with any other and discover what was happening in the world at that moment.">
+        Escala del Tiempo pone la historia y la prehistoria en el mismo eje,
+        para que puedas comparar cualquier año con cualquier otro y descubrir
+        qué pasaba en el mundo en ese instante.
+      </p>
+
+      <!-- Widget Comparador Interactivo -->
+      <div class="landing__scale-widget">
+        <div class="scale-widget__bar">
+          <div class="scale-widget__fill" id="scaleWidgetFill" style="width: 100%;"></div>
+        </div>
+        <div class="scale-widget__buttons">
+          <button class="scale-widget__btn" data-scale="100"><i data-lucide="earth"></i> <span data-i18n-es="Edad de la Tierra" data-i18n-en="Age of the Earth">Edad de la Tierra</span> <small>4.600 Ma</small></button>
+          <button class="scale-widget__btn" data-scale="25"><i data-lucide="footprints"></i> <span data-i18n-es="Dinosaurios" data-i18n-en="Dinosaurs">Dinosaurios</span> <small>230 Ma</small></button>
+          <button class="scale-widget__btn" data-scale="2"><i data-lucide="landmark"></i> <span data-i18n-es="Historia Escrita" data-i18n-en="Written History">Historia Escrita</span> <small>5.000 a.</small></button>
+          <button class="scale-widget__btn is-active" data-scale="0.05"><i data-lucide="user"></i> <span data-i18n-es="Vida Humana" data-i18n-en="Human Life">Vida Humana</span> <small>~80 a.</small></button>
+        </div>
+        <div class="scale-widget__caption" id="scaleWidgetCaption" data-i18n-es="Representación visual de la compresión del tiempo" data-i18n-en="Visual representation of time compression">
+          Representación visual de la compresión del tiempo
+        </div>
+      </div>
+
+      <div class="landing__stats">
+        <span id="statEvents" data-i18n-es="70+ hitos históricos" data-i18n-en="70+ historical milestones">70+ hitos históricos</span> •
+        <span id="statEras" data-i18n-es="36 eras geológicas" data-i18n-en="36 geological eras">36 eras geológicas</span> •
+        <span data-i18n-es="4.600 millones de años" data-i18n-en="4.6 billion years">4.600 millones de años</span>
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card__num">01</div>
+          <h3 data-i18n-es="Un eje, muchas escalas" data-i18n-en="One axis, many scales">Un eje, muchas escalas</h3>
+          <p data-i18n-es="El tiempo no se reparte igual: los últimos siglos ocupan más espacio que la prehistoria, porque es donde hay más historia registrada." data-i18n-en="Time is not distributed equally: the last few centuries take up more space than prehistory, because that is where most recorded history lies.">El tiempo no se reparte igual: los últimos siglos ocupan más espacio que la prehistoria, porque es donde hay más historia registrada.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card__num">02</div>
+          <h3 data-i18n-es="Viaja arrastrando" data-i18n-en="Drag to travel">Viaja arrastrando</h3>
+          <p data-i18n-es="Mueve la barra lateral, escribe un año directamente, usa las flechas o el teclado (↑/↓) para saltar de un hito al siguiente." data-i18n-en="Move the sidebar, type a year directly, or use the arrows/keyboard (↑/↓) to jump from one milestone to the next.">Mueve la barra lateral, escribe un año directamente, usa las flechas o el teclado (↑/↓) para saltar de un hito al siguiente.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card__num">03</div>
+          <h3 data-i18n-es="Un dato en cada parada" data-i18n-en="A fact at every stop">Un dato en cada parada</h3>
+          <p data-i18n-es="Cada nodo de la línea esconde un dato curioso sobre ese momento exacto de la historia del mundo. Ahora con colores por temática." data-i18n-en="Each node on the timeline hides a fun fact about that exact moment in world history. Now color-coded by theme.">Cada nodo de la línea esconde un dato curioso sobre ese momento exacto de la historia del mundo. Ahora con colores por temática.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card__num">04</div>
+          <h3 data-i18n-es="Búsqueda global" data-i18n-en="Global search">Búsqueda global</h3>
+          <p data-i18n-es="Usa el buscador para ir a un año, encontrar una era, o simplemente escribe palabras clave como &quot;Pangea&quot; o &quot;Roma&quot; para buscar eventos." data-i18n-en="Use the search bar to go to a year, find an era, or simply type keywords like &quot;Pangea&quot; or &quot;Rome&quot; to search for events.">Usa el buscador para ir a un año, encontrar una era, o simplemente escribe palabras clave como "Pangea" o "Roma" para buscar eventos.</p>
+        </div>
+      </div>
+
+      <div class="landing__actions">
+        <button class="landing__cta" id="enterAppBtn">
+          <span data-i18n-es="Explorar la línea de tiempo" data-i18n-en="Explore the timeline">Explorar la línea de tiempo</span>
+          <span class="landing__cta-arrow">→</span>
+        </button>
+      </div>
+      
+      <div class="landing__quick-starts">
+        <span class="quick-starts__label" data-i18n-es="Saltos rápidos:" data-i18n-en="Quick jumps:">Saltos rápidos:</span>
+        <button class="quick-starts__btn" data-jump="2024"><i data-lucide="rocket"></i> <span data-i18n-es="Actualidad" data-i18n-en="Present day">Actualidad</span></button>
+        <button class="quick-starts__btn" data-jump="Edad de Hierro"><i data-lucide="swords"></i> <span data-i18n-es="Edad de Hierro" data-i18n-en="Iron Age">Edad de Hierro</span></button>
+        <button class="quick-starts__btn" data-jump="Cretácico"><i data-lucide="footprints"></i> <span data-i18n-es="Dinosaurios" data-i18n-en="Dinosaurs">Dinosaurios</span></button>
+        <button class="quick-starts__btn" data-jump="Formación de la Tierra"><i data-lucide="flame"></i> <span data-i18n-es="Origen de la Tierra" data-i18n-en="Origin of Earth">Origen de la Tierra</span></button>
+      </div>
+
+      <div class="landing__support">
+        <span class="support__label" data-i18n-es="Apoya este proyecto:" data-i18n-en="Support this project:">Apoya este proyecto:</span>
+        <a href="https://patreon.com" target="_blank" rel="noopener noreferrer" class="support__btn support__btn--patreon">
+          <svg viewBox="0 0 512 512" fill="currentColor" width="14" height="14"><path d="M512 194.8c0 101.3-82.4 183.8-183.8 183.8-101.7 0-184.4-82.4-184.4-183.8 0-101.6 82.7-184.3 184.4-184.3C429.6 10.5 512 93.2 512 194.8zM0 501.5h98.6v-491H0v491z"/></svg>
+          Patreon
+        </a>
+        <a href="https://buymeacoffee.com/" target="_blank" rel="noopener noreferrer" class="support__btn support__btn--coffee">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM2 21h18v-2H2v2z"/></svg>
+          Buy me a coffee
+        </a>
+        <a href="https://github.com/tu-usuario/escala-tiempo" target="_blank" rel="noopener noreferrer" class="support__btn support__btn--github">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <p class="footnote" data-i18n-es="Las fechas son aproximaciones simplificadas con fines educativos. Distintas fuentes pueden usar límites algo distintos." data-i18n-en="Dates are simplified approximations for educational purposes. Different sources may use slightly different boundaries.">
+        <i data-lucide="triangle-alert"></i> Las fechas son aproximaciones simplificadas con fines educativos.
+        Distintas fuentes pueden usar límites algo distintos.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       VISTA 2 · APLICACIÓN
+       ====================================================== -->
+  <div class="app-view" id="appView" hidden>
+
+    <header class="app-header">
+      <!-- Controles apilados a la izquierda -->
+      <div class="app-header__controls">
+        <button class="ctrl-btn" id="backToLandingBtn" aria-label="Volver a la presentación" title="Volver">←</button>
+        <button class="ctrl-btn" id="orientationToggle" aria-label="Cambiar orientación" title="Orientación">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"/>
+            <polyline points="9 21 3 21 3 15"/>
+            <line x1="21" y1="3" x2="14" y2="10"/>
+            <line x1="3" y1="21" x2="10" y2="14"/>
+          </svg>
+        </button>
+        <button class="ctrl-btn ctrl-btn--accent" id="erasToggle" aria-label="Ver eras y etapas" title="Eras">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+        </button>
+        <button class="ctrl-btn ctrl-btn--projector" id="projectorToggle" aria-label="Modo Proyector" title="Modo Proyector">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+            <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+            <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+        </button>
+        <button class="ctrl-btn" id="appSettingsToggle" aria-label="Ajustes" title="Ajustes">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="app-header__titles">
+        <div class="app-title"><span class="app-title__mark">·</span> <span data-i18n-es="Escala del Tiempo" data-i18n-en="Timeline Scale">Escala&nbsp;del&nbsp;Tiempo</span></div>
+        <div class="app-subtitle" data-i18n-es="Un mismo eje, un millón de años" data-i18n-en="One axis, one million years">Un mismo eje, un millón de años</div>
+      </div>
+    </header>
+
+    <!-- Panel de eras (slide-out) -->
+    <div class="eras-panel" id="erasPanel" hidden>
+      <div class="eras-panel__header">
+        <h2 class="eras-panel__title" data-i18n-es="Eras y etapas" data-i18n-en="Eras and stages">Eras y etapas</h2>
+        <button class="eras-panel__close" id="erasPanelClose" aria-label="Cerrar panel">×</button>
+      </div>
+      <div class="eras-panel__body">
+        <div class="eras-panel__section">
+          <h3 class="eras-panel__section-title"><i data-lucide="flame"></i> <span data-i18n-es="Eras geológicas" data-i18n-en="Geological Eras">Eras geológicas</span></h3>
+          <div class="eras-panel__chips" id="eraChipsGeo"></div>
+        </div>
+        <div class="eras-panel__section">
+          <h3 class="eras-panel__section-title"><i data-lucide="landmark"></i> <span data-i18n-es="Edades históricas" data-i18n-en="Historical Ages">Edades históricas</span></h3>
+          <div class="eras-panel__chips" id="eraChipsHist"></div>
+        </div>
+      </div>
+      <p class="eras-panel__note" data-i18n-es="Toca una etapa para viajar a su inicio." data-i18n-en="Tap a stage to travel to its beginning.">Toca una etapa para viajar a su inicio.</p>
+    </div>
+
+    <!-- ======= LÍNEA DEL TIEMPO CENTRAL ======= -->
+    <main class="timeline-viewport" id="timelineViewport">
+      <div class="timeline-axis" id="timelineAxis"></div>
+
+      <div class="now-marker" id="nowMarker">
+        <div class="now-marker__line"></div>
+        <div class="now-marker__dot"></div>
+      </div>
+
+      <div class="timeline-track" id="timelineTrack">
+        <!-- Los nodos de evento se insertan aquí por JS -->
+      </div>
+    </main>
+
+    <!-- Botón para cerrar la era-band activa -->
+    <button class="era-clear-btn" id="eraClearBtn" hidden aria-label="Cerrar era resaltada">
+      ✕ Cerrar era
+    </button>
+
+    <!-- Tarjeta flotante de dato curioso (glass) -->
+    <div class="fact-card" id="factCard" hidden>
+      <div class="fact-card__inner">
+        <div class="fact-card__header">
+          <div class="fact-card__year" id="factYear"></div>
+          <button class="fact-card__close" id="factCardClose" aria-label="Cerrar">×</button>
+        </div>
+        <div class="fact-card__title" id="factTitle"></div>
+        <div class="fact-card__text" id="factText"></div>
+      </div>
+    </div>
+
+    <!-- ======= BARRA LATERAL ESTILO "LIQUID GLASS" ======= -->
+    <aside class="side-control" id="sideControl">
+
+      <form class="year-jump" id="yearJumpForm" autocomplete="off">
+        <input
+          type="text"
+          id="yearInput"
+          class="year-jump__input"
+          inputmode="text"
+          placeholder="Buscar..."
+          data-i18n-es-placeholder="Buscar..."
+          data-i18n-en-placeholder="Search..."
+          aria-label="Ir a un año, buscar una era o buscar texto (ej: Roma, Pangea)">
+        <button type="button" class="year-jump__clear" id="yearClearBtn" aria-label="Limpiar buscador" hidden>×</button>
+        <button type="submit" class="year-jump__go" aria-label="Ir">
+          <i data-lucide="search" style="width: 14px; height: 14px; display: block;"></i>
+        </button>
+      </form>
+
+      <div class="glass-slider" id="glassSlider">
+        <button class="glass-slider__arrow glass-slider__arrow--up" id="arrowUp" aria-label="Evento anterior (más reciente)">▲</button>
+
+        <div class="glass-slider__track" id="sliderTrack">
+          <div class="glass-slider__ticks" id="sliderTicks"></div>
+          <div class="glass-slider__fill" id="sliderFill"></div>
+          <div class="glass-slider__thumb" id="sliderThumb">
+            <span id="thumbYear">2026</span>
+          </div>
+        </div>
+
+        <button class="glass-slider__arrow glass-slider__arrow--down" id="arrowDown" aria-label="Evento siguiente (más antiguo)">▼</button>
+      </div>
+    </aside>
+
+    <!-- Footnote de precisión -->
+    <div class="app-footnote" id="appFootnote" data-i18n-es="Las fechas son aproximaciones simplificadas con fines educativos." data-i18n-en="Dates are simplified approximations for educational purposes.">
+      Las fechas son aproximaciones simplificadas con fines educativos.
+    </div>
+  </div>
+
+  <!-- Panel de ajustes (Liquid Glass) -->
+  <div class="settings-panel" id="settingsPanel" hidden>
+    <div class="settings-panel__backdrop" id="settingsPanelClose"></div>
+    <div class="settings-panel__content">
+      <h2 data-i18n-es="Ajustes" data-i18n-en="Settings">Ajustes</h2>
+      
+      <div class="settings-group">
+        <label data-i18n-es="Idioma" data-i18n-en="Language">Idioma</label>
+        <div class="lang-toggle">
+          <button class="lang-btn is-active" data-lang="es">Español</button>
+          <button class="lang-btn" data-lang="en">English</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Resultados de Búsqueda (Liquid Glass) -->
+  <div class="settings-panel" id="searchResultsModal" hidden>
+    <div class="settings-panel__backdrop" id="searchResultsClose"></div>
+    <div class="settings-panel__content search-results-content">
+      <h2 data-i18n-es="Resultados de búsqueda" data-i18n-en="Search Results">Resultados de búsqueda</h2>
+      <div class="search-results-list" id="searchResultsList">
+        <!-- Los resultados se inyectarán aquí -->
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
