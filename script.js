@@ -861,13 +861,14 @@ projectorToggle.addEventListener('click', () => {
 });
 
 /* ================================================================
-   INTERACCIÓN BÁSICA (Deslizar con el dedo/ratón en Viewport, Slider y Rueda)
+   INTERACCIÓN BÁSICA (Deslizar con el dedo en Móvil/Tablet y Ratón en PC)
    ================================================================ */
 let wasDraggingViewport = false;
 let isViewportDragging = false;
-let startPointerPos = { x: 0, y: 0 };
-let lastPointerPos = { x: 0, y: 0 };
-let lastPointerTime = 0;
+let activeDragPointerId = null;
+let startTouchPos = { x: 0, y: 0 };
+let lastTouchPos = { x: 0, y: 0 };
+let lastTouchTime = 0;
 let velocityT = 0;
 let startT = 0;
 let inertiaAnimFrame = null;
@@ -881,31 +882,50 @@ function stopInertia() {
   }
 }
 
-function onViewportPointerDown(e) {
-  // Ignorar si se toca dentro de controles interactivos (botones, inputs, paneles, tarjetas)
-  if (e.target.closest('button, input, select, textarea, a, .fact-card, .eras-panel, .side-control, .app-header')) {
+function getEventClientCoords(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+  }
+  return { x: e.clientX, y: e.clientY };
+}
+
+function handleDragStart(e) {
+  // Ignorar si se toca en botones, inputs, enlaces, dentro del panel de eras o la barra lateral
+  if (e.target.closest('button, input, select, textarea, a, #erasPanel, #settingsPanel, #searchResultsModal, #sideControl, .fact-card__close')) {
     return;
   }
 
   stopInertia();
   isViewportDragging = true;
   wasDraggingViewport = false;
-  startPointerPos = { x: e.clientX, y: e.clientY };
-  lastPointerPos = { x: e.clientX, y: e.clientY };
-  lastPointerTime = performance.now();
+
+  const coords = getEventClientCoords(e);
+  startTouchPos = { x: coords.x, y: coords.y };
+  lastTouchPos = { x: coords.x, y: coords.y };
+  lastTouchTime = performance.now();
   startT = currentT;
   velocityT = 0;
 
-  try {
-    timelineViewport.setPointerCapture(e.pointerId);
-  } catch (err) {}
+  if (e.type === 'pointerdown') {
+    activeDragPointerId = e.pointerId;
+    try { timelineViewport.setPointerCapture(e.pointerId); } catch (err) {}
+  }
 }
 
-function onViewportPointerMove(e) {
+function handleDragMove(e) {
   if (!isViewportDragging) return;
 
-  const dx = e.clientX - startPointerPos.x;
-  const dy = e.clientY - startPointerPos.y;
+  // Crucial para móvil y tablet: prevenir el scroll por defecto del navegador
+  if (e.cancelable) {
+    e.preventDefault();
+  }
+
+  const coords = getEventClientCoords(e);
+  const dx = coords.x - startTouchPos.x;
+  const dy = coords.y - startTouchPos.y;
   const totalDist = Math.hypot(dx, dy);
 
   if (totalDist > 6) {
@@ -913,34 +933,36 @@ function onViewportPointerMove(e) {
   }
 
   const isHoriz = orientation === 'horizontal';
-  // En vertical: arrastrar hacia arriba (startPointerPos.y > clientY) avanza la línea de tiempo hacia abajo (t aumenta)
-  // En horizontal: arrastrar hacia la izquierda (startPointerPos.x > clientX) avanza la línea de tiempo a la derecha (t aumenta)
-  const deltaPixels = isHoriz ? (startPointerPos.x - e.clientX) : (startPointerPos.y - e.clientY);
+  const deltaPixels = isHoriz ? (startTouchPos.x - coords.x) : (startTouchPos.y - coords.y);
   const deltaT = deltaPixels / TRACK_SIZE;
 
   clearEraBand();
   setT(startT + deltaT, false);
 
   const now = performance.now();
-  const dt = now - lastPointerTime;
+  const dt = now - lastTouchTime;
   if (dt > 8) {
-    const currentPos = isHoriz ? e.clientX : e.clientY;
-    const prevPos = isHoriz ? lastPointerPos.x : lastPointerPos.y;
+    const currentPos = isHoriz ? coords.x : coords.y;
+    const prevPos = isHoriz ? lastTouchPos.x : lastTouchPos.y;
     const pDelta = prevPos - currentPos;
     const instVelocity = (pDelta / TRACK_SIZE) / (dt / 1000);
     velocityT = velocityT * 0.3 + instVelocity * 0.7;
-    lastPointerPos = { x: e.clientX, y: e.clientY };
-    lastPointerTime = now;
+    lastTouchPos = { x: coords.x, y: coords.y };
+    lastTouchTime = now;
   }
 }
 
-function onViewportPointerUp(e) {
+function handleDragEnd(e) {
   if (!isViewportDragging) return;
-  isViewportDragging = false;
 
-  try {
-    timelineViewport.releasePointerCapture(e.pointerId);
-  } catch (err) {}
+  if (e.type === 'pointerup' || e.type === 'pointercancel') {
+    if (activeDragPointerId !== null) {
+      try { timelineViewport.releasePointerCapture(activeDragPointerId); } catch (err) {}
+      activeDragPointerId = null;
+    }
+  }
+
+  isViewportDragging = false;
 
   if (wasDraggingViewport) {
     setTimeout(() => { wasDraggingViewport = false; }, 50);
@@ -965,10 +987,16 @@ function onViewportPointerUp(e) {
   }
 }
 
-timelineViewport.addEventListener('pointerdown', onViewportPointerDown);
-timelineViewport.addEventListener('pointermove', onViewportPointerMove);
-timelineViewport.addEventListener('pointerup', onViewportPointerUp);
-timelineViewport.addEventListener('pointercancel', onViewportPointerUp);
+// Escuchadores de eventos Pointer (Ratón / Pen)
+timelineViewport.addEventListener('pointerdown', handleDragStart);
+timelineViewport.addEventListener('pointermove', handleDragMove);
+timelineViewport.addEventListener('pointerup', handleDragEnd);
+
+// Escuchadores de eventos Touch Nativos (Móvil y Tablet iOS / Android)
+timelineViewport.addEventListener('touchstart', handleDragStart, { passive: true });
+timelineViewport.addEventListener('touchmove', handleDragMove, { passive: false });
+timelineViewport.addEventListener('touchend', handleDragEnd, { passive: true });
+timelineViewport.addEventListener('touchcancel', handleDragEnd, { passive: true });
 
 // Slider lateral glass
 let dragging = false;

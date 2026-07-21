@@ -376,6 +376,9 @@ html[data-theme="light"] .support__btn--github{
   z-index: 1;
   opacity: 1;
   transition: opacity .45s ease;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .app-view[hidden]{ display: none; }
 .landing.is-hidden{ display: none; }
