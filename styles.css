@@ -531,6 +531,13 @@ html[data-theme="dark"] .floating-theme-toggle .theme-icon--sun { display: none;
   position: absolute;
   inset: 0;
   overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.timeline-viewport:active{
+  cursor: grabbing;
 }
 
 .timeline-axis{

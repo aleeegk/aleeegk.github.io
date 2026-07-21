@@ -641,7 +641,7 @@ function renderEventNodes() {
       <span class="event-node__dot"></span>
       <span class="event-node__label">${formatYear(ev.year)} · ${ev.evento}</span>
     `;
-    node.addEventListener('click', () => { clearEraBand(); setT(t, true); });
+    node.addEventListener('click', () => { if (wasDraggingViewport) return; clearEraBand(); setT(t, true); });
     node.addEventListener('mouseenter', () => showFact(ev));
     node.addEventListener('mouseleave', () => updateActiveNodeAndFact());
     timelineTrack.appendChild(node);
@@ -861,8 +861,116 @@ projectorToggle.addEventListener('click', () => {
 });
 
 /* ================================================================
-   INTERACCIÓN BÁSICA (Arrastre, Rueda)
+   INTERACCIÓN BÁSICA (Deslizar con el dedo/ratón en Viewport, Slider y Rueda)
    ================================================================ */
+let wasDraggingViewport = false;
+let isViewportDragging = false;
+let startPointerPos = { x: 0, y: 0 };
+let lastPointerPos = { x: 0, y: 0 };
+let lastPointerTime = 0;
+let velocityT = 0;
+let startT = 0;
+let inertiaAnimFrame = null;
+
+const timelineViewport = document.getElementById('timelineViewport');
+
+function stopInertia() {
+  if (inertiaAnimFrame) {
+    cancelAnimationFrame(inertiaAnimFrame);
+    inertiaAnimFrame = null;
+  }
+}
+
+function onViewportPointerDown(e) {
+  // Ignorar si se toca dentro de controles interactivos (botones, inputs, paneles, tarjetas)
+  if (e.target.closest('button, input, select, textarea, a, .fact-card, .eras-panel, .side-control, .app-header')) {
+    return;
+  }
+
+  stopInertia();
+  isViewportDragging = true;
+  wasDraggingViewport = false;
+  startPointerPos = { x: e.clientX, y: e.clientY };
+  lastPointerPos = { x: e.clientX, y: e.clientY };
+  lastPointerTime = performance.now();
+  startT = currentT;
+  velocityT = 0;
+
+  try {
+    timelineViewport.setPointerCapture(e.pointerId);
+  } catch (err) {}
+}
+
+function onViewportPointerMove(e) {
+  if (!isViewportDragging) return;
+
+  const dx = e.clientX - startPointerPos.x;
+  const dy = e.clientY - startPointerPos.y;
+  const totalDist = Math.hypot(dx, dy);
+
+  if (totalDist > 6) {
+    wasDraggingViewport = true;
+  }
+
+  const isHoriz = orientation === 'horizontal';
+  // En vertical: arrastrar hacia arriba (startPointerPos.y > clientY) avanza la línea de tiempo hacia abajo (t aumenta)
+  // En horizontal: arrastrar hacia la izquierda (startPointerPos.x > clientX) avanza la línea de tiempo a la derecha (t aumenta)
+  const deltaPixels = isHoriz ? (startPointerPos.x - e.clientX) : (startPointerPos.y - e.clientY);
+  const deltaT = deltaPixels / TRACK_SIZE;
+
+  clearEraBand();
+  setT(startT + deltaT, false);
+
+  const now = performance.now();
+  const dt = now - lastPointerTime;
+  if (dt > 8) {
+    const currentPos = isHoriz ? e.clientX : e.clientY;
+    const prevPos = isHoriz ? lastPointerPos.x : lastPointerPos.y;
+    const pDelta = prevPos - currentPos;
+    const instVelocity = (pDelta / TRACK_SIZE) / (dt / 1000);
+    velocityT = velocityT * 0.3 + instVelocity * 0.7;
+    lastPointerPos = { x: e.clientX, y: e.clientY };
+    lastPointerTime = now;
+  }
+}
+
+function onViewportPointerUp(e) {
+  if (!isViewportDragging) return;
+  isViewportDragging = false;
+
+  try {
+    timelineViewport.releasePointerCapture(e.pointerId);
+  } catch (err) {}
+
+  if (wasDraggingViewport) {
+    setTimeout(() => { wasDraggingViewport = false; }, 50);
+  }
+
+  // Inercia (deslizamiento fluido al soltar con impulso)
+  if (Math.abs(velocityT) > 0.005) {
+    let lastFrameTime = performance.now();
+    function stepInertia(now) {
+      const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+      lastFrameTime = now;
+      velocityT *= Math.pow(0.90, dt * 60);
+
+      if (Math.abs(velocityT) < 0.0002 || currentT <= 0 || currentT >= 1) {
+        velocityT = 0;
+        return;
+      }
+      setT(currentT + velocityT * dt, false);
+      inertiaAnimFrame = requestAnimationFrame(stepInertia);
+    }
+    inertiaAnimFrame = requestAnimationFrame(stepInertia);
+  }
+}
+
+timelineViewport.addEventListener('pointerdown', onViewportPointerDown);
+timelineViewport.addEventListener('pointermove', onViewportPointerMove);
+timelineViewport.addEventListener('pointerup', onViewportPointerUp);
+timelineViewport.addEventListener('pointercancel', onViewportPointerUp);
+
+// Slider lateral glass
 let dragging = false;
 function pointerToT(clientX, clientY) {
   const rect = sliderTrack.getBoundingClientRect();
@@ -871,7 +979,7 @@ function pointerToT(clientX, clientY) {
   const insetFraction = SLIDER_EDGE_INSET / 100;
   return clamp((raw - insetFraction) / (1 - 2 * insetFraction), 0, 1);
 }
-function onPointerDown(e) { dragging = true; clearEraBand(); sliderTrack.setPointerCapture(e.pointerId); setT(pointerToT(e.clientX, e.clientY), false); }
+function onPointerDown(e) { stopInertia(); dragging = true; clearEraBand(); sliderTrack.setPointerCapture(e.pointerId); setT(pointerToT(e.clientX, e.clientY), false); }
 function onPointerMove(e) { if (!dragging) return; setT(pointerToT(e.clientX, e.clientY), false); }
 function onPointerUp(e) { dragging = false; try { sliderTrack.releasePointerCapture(e.pointerId); } catch (err) {} }
 sliderTrack.addEventListener('pointerdown', onPointerDown);
@@ -879,7 +987,8 @@ sliderTrack.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
 
-document.getElementById('timelineViewport').addEventListener('wheel', (e) => {
+timelineViewport.addEventListener('wheel', (e) => {
+  stopInertia();
   e.preventDefault();
   clearEraBand();
   setT(currentT + (e.deltaY * 0.00025), false);
