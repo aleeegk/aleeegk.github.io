@@ -712,7 +712,7 @@ html[data-orientation="horizontal"] .era-band__label{ top: auto; bottom: 14px; l
   top: 50%;
   left: 50%;
   transform: translate(60px, -50%); /* Movido a la derecha del eje para no tapar */
-  z-index: 15;
+  z-index: 50; /* Por encima de la barra lateral (z-index 20) y cabecera */
   width: min(340px, 85vw);
   pointer-events: auto;
   animation: fade-in-scale .25s cubic-bezier(.22,.61,.36,1) both;
@@ -723,6 +723,10 @@ html[data-orientation="horizontal"] .fact-card {
 @keyframes fade-in-scale{
   from{ opacity: 0; transform: translate(60px, calc(-50% + 10px)) scale(0.95); }
   to{ opacity: 1; transform: translate(60px, -50%) scale(1); }
+}
+@keyframes fade-card-up{
+  from{ opacity: 0; transform: translate(-50%, 16px) scale(0.96); }
+  to{ opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
 .fact-card[hidden]{ display: none; }
@@ -911,6 +915,19 @@ html[data-orientation="horizontal"] body.is-presenter-mode .fact-card {
 @media (max-width: 900px){
   .concept-grid{ grid-template-columns: repeat(2, 1fr); }
 }
+@media (max-width: 1024px){
+  .fact-card{
+    position: fixed !important;
+    top: auto !important;
+    bottom: 24px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(440px, calc(100vw - 32px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    z-index: 50 !important;
+    animation: fade-card-up .25s cubic-bezier(.22,.61,.36,1) both !important;
+  }
+}
 @media (max-width: 640px){
   .concept-grid{ grid-template-columns: 1fr; }
   .landing__inner{ padding-top: 50px; }
@@ -926,7 +943,6 @@ html[data-orientation="horizontal"] body.is-presenter-mode .fact-card {
   .landing__title{ font-size: 28px; }
   .ctrl-btn{ width: 32px; height: 32px; font-size: 13px; border-radius: 10px; }
   
-  .fact-card{ width: calc(100vw - 32px); left: 16px; top: auto; bottom: 24px; transform: none !important; animation: fade-up .25s ease both !important; }
   .app-footnote{ display: none; }
   
   .scale-widget__buttons{ flex-direction: column; align-items: stretch; }
