@@ -442,6 +442,30 @@ html[data-theme="light"] .theme-icon--moon{ display: inline; }
 .app-title__mark{ color: var(--accent); }
 .app-subtitle{ font-size: 13px; color: var(--text-faint); font-weight: 500; }
 
+.floating-theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-strong);
+  color: var(--text);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.floating-theme-toggle:hover { background: var(--glass-fill-strong); transform: scale(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+.floating-theme-toggle:active { transform: scale(0.9); }
+
 .floating-settings-toggle {
   position: fixed;
   bottom: 20px;

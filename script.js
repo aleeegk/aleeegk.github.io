@@ -1197,17 +1197,23 @@ scaleWidgetBtns.forEach(btn => {
 });
 
 // Tema Oscuro/Claro
-const themeToggle = document.getElementById('themeToggle');
+const themeToggles = document.querySelectorAll('#themeToggle, #landingThemeToggle');
 function applyTheme(theme) {
   htmlEl.setAttribute('data-theme', theme);
-  themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  themeToggles.forEach(toggle => {
+    if (toggle) {
+      toggle.setAttribute('aria-label', theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+    }
+  });
 }
 const savedTheme = localStorage.getItem('escala-tiempo-theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 applyTheme(savedTheme);
-themeToggle.addEventListener('click', () => {
-  const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  localStorage.setItem('escala-tiempo-theme', next);
+themeToggles.forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem('escala-tiempo-theme', next);
+  });
 });
 
 /* ================================================================
