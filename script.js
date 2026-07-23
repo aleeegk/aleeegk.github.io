@@ -64,16 +64,34 @@ function normalize(str) {
 function formatYear(year) {
   year = Math.round(year);
   const lang = (typeof currentLang !== 'undefined') ? currentLang : 'es';
-  const bc = lang === 'en' ? ' BC' : ' a.C.';
-  const locale = lang === 'en' ? 'en-US' : 'es-ES';
+  let bc = ' a.C.';
+  let locale = 'es-ES';
+  if (lang === 'en') { bc = ' BC'; locale = 'en-US'; }
+  else if (lang === 'fr') { bc = ' av. J.-C.'; locale = 'fr-FR'; }
+  else if (lang === 'it') { bc = ' a.C.'; locale = 'it-IT'; }
+  else if (lang === 'ca') { bc = ' a.C.'; locale = 'ca-ES'; }
+
   if (year < 0) {
     const abs = Math.abs(year);
-    if (abs >= 1000000000) return (abs / 1000000000).toFixed(abs % 1000000000 === 0 ? 0 : 2) + (lang === 'en' ? ' B' : ' mil M') + bc;
+    if (abs >= 1000000000) {
+      let unit = ' mil M';
+      if (lang === 'en') unit = ' B';
+      else if (lang === 'fr') unit = ' Mld';
+      else if (lang === 'it') unit = ' mld';
+      else if (lang === 'ca') unit = ' mil M';
+      return (abs / 1000000000).toFixed(abs % 1000000000 === 0 ? 0 : 2) + unit + bc;
+    }
     if (abs >= 1000000) return (abs / 1000000).toFixed(abs % 1000000 === 0 ? 0 : 1) + ' M' + bc;
     if (abs >= 1000) return abs.toLocaleString(locale) + bc;
     return abs + bc;
   }
-  if (year === 0) return lang === 'en' ? 'Year 0' : 'Año 0';
+  if (year === 0) {
+    if (lang === 'en') return 'Year 0';
+    if (lang === 'fr') return 'Année 0';
+    if (lang === 'it') return 'Anno 0';
+    if (lang === 'ca') return 'Any 0';
+    return 'Año 0';
+  }
   return year.toLocaleString(locale);
 }
 
@@ -361,6 +379,390 @@ const EVENTS_EN = [
   { year: 1994, evento: 'End of apartheid in South Africa', datoCurioso: 'Nelson Mandela, imprisoned for 27 years, was elected president that same year.', cat: 'historia' },
 ].sort((a, b) => b.year - a.year);
 
+const EVENTS_FR = [
+  // --- XXIe siècle ---
+  { year: 2024, evento: 'Essor de l\'IA générative', datoCurioso: 'ChatGPT a atteint 100 millions d\'utilisateurs en seulement 2 mois.', cat: 'historia' },
+  { year: 2020, evento: 'Pandémie de COVID-19', datoCurioso: 'L\'OMS l\'a déclarée pandémie mondiale le 11 mars 2020.', cat: 'biologia' },
+  { year: 2012, evento: 'Découverte du boson de Higgs', datoCurioso: 'Peter Higgs avait prédit son existence en 1964, près de 50 ans avant sa confirmation.', cat: 'historia' },
+  { year: 2007, evento: 'Présentation de l\'iPhone', datoCurioso: 'Steve Jobs l\'a décrit comme « un iPod, un téléphone et Internet ».', cat: 'historia' },
+  { year: 2001, evento: 'Attentats du 11 septembre', datoCurioso: 'Les tours jumelles ont mis 7 ans à être construites et 102 minutes à s\'effondrer.', cat: 'historia' },
+  // --- XXe siècle ---
+  { year: 1991, evento: 'Dissolution de l\'Union soviétique', datoCurioso: 'L\'URSS s\'est officiellement dissoute le jour de Noël 1991.', cat: 'historia' },
+  { year: 1989, evento: 'Chute du mur de Berlin', datoCurioso: 'Il est tombé à cause d\'une erreur de communication lors d\'une conférence de presse.', cat: 'historia' },
+  { year: 1986, evento: 'Catastrophe de Tchernobyl', datoCurioso: 'La zone d\'exclusion de 30 km reste inhabitée et est devenue un refuge pour la faune.', cat: 'historia' },
+  { year: 1977, evento: 'Lancement de la sonde Voyager 1', datoCurioso: 'Elle continue d\'envoyer des données depuis l\'espace interstellaire, à plus de 24 milliards de km.', cat: 'geologia' },
+  { year: 1969, evento: 'Alunissage', datoCurioso: 'L\'ordinateur d\'Apollo 11 avait moins de puissance qu\'une calculatrice moderne.', cat: 'geologia' },
+  { year: 1961, evento: 'Youri Gagarine dans l\'espace', datoCurioso: 'Le vol n\'a duré que 108 minutes et a effectué une seule orbite autour de la Terre.', cat: 'historia' },
+  { year: 1953, evento: 'Structure de l\'ADN', datoCurioso: 'La photo clé (Photo 51) a été prise par Rosalind Franklin.', cat: 'biologia' },
+  { year: 1945, evento: 'Fin de la Seconde Guerre mondiale', datoCurioso: 'L\'ONU a été fondée la même année, avec 51 pays membres.', cat: 'historia' },
+  { year: 1939, evento: 'Début de la Seconde Guerre mondiale', datoCurioso: 'Le conflit le plus meurtrier de l\'histoire : entre 70 et 85 millions de morts.', cat: 'historia' },
+  { year: 1928, evento: 'Découverte de la pénicilline', datoCurioso: 'Alexander Fleming l\'a trouvée par accident dans une culture oubliée.', cat: 'biologia' },
+  { year: 1914, evento: 'Début de la Première Guerre mondiale', datoCurioso: 'L\'assassinat d\'un archiduc a déclenché un conflit entre 30 nations.', cat: 'historia' },
+  { year: 1903, evento: 'Premier vol (frères Wright)', datoCurioso: 'Il n\'a duré que 12 secondes et a couvert 37 mètres.', cat: 'historia' },
+  // --- XIXe siècle ---
+  { year: 1889, evento: 'Tour Eiffel', datoCurioso: 'Construite comme entrée temporaire pour l\'Exposition universelle de Paris.', cat: 'historia' },
+  { year: 1876, evento: 'Téléphone', datoCurioso: 'Elisha Gray a déposé un brevet similaire le même jour, quelques heures plus tard.', cat: 'historia' },
+  { year: 1869, evento: 'Tableau périodique de Mendeleïev', datoCurioso: 'Il a prédit l\'existence d\'éléments non encore découverts et avait raison.', cat: 'historia' },
+  { year: 1859, evento: 'Publication de « L\'Origine des espèces »', datoCurioso: 'Épuisé dès le premier jour de vente.', cat: 'biologia' },
+  { year: 1804, evento: 'Napoléon empereur', datoCurioso: 'Il s\'est couronné lui-même, prenant la couronne des mains du pape.', cat: 'historia' },
+  // --- XVIe au XVIIIe siècle ---
+  { year: 1789, evento: 'Révolution française', datoCurioso: 'Le calendrier révolutionnaire comportait des semaines de 10 jours.', cat: 'historia' },
+  { year: 1776, evento: 'Indépendance des États-Unis', datoCurioso: 'Jefferson a mis 17 jours pour écrire la Déclaration.', cat: 'historia' },
+  { year: 1687, evento: 'Lois de Newton', datoCurioso: 'Dans les « Principia », il formule la loi de la gravitation universelle.', cat: 'geologia' },
+  { year: 1608, evento: 'Télescope', datoCurioso: 'Galilée l\'a amélioré un an plus tard et l\'a pointé vers le ciel.', cat: 'historia' },
+  { year: 1543, evento: 'Révolution copernicienne', datoCurioso: 'Le livre affirmant que la Terre tourne autour du Soleil a été publié l\'année de sa mort.', cat: 'geologia' },
+  { year: 1492, evento: 'Arrivée en Amérique', datoCurioso: 'Colomb est mort convaincu d\'avoir atteint l\'Asie.', cat: 'historia' },
+  { year: 1440, evento: 'Imprimerie (Gutenberg)', datoCurioso: 'Sa première grande œuvre fut la Bible à 42 lignes.', cat: 'historia' },
+  // --- Moyen Âge ---
+  { year: 1347, evento: 'Peste noire', datoCurioso: 'Elle a tué un tiers de la population européenne en à peine six ans.', cat: 'biologia' },
+  { year: 1325, evento: 'Fondation de Tenochtitlan', datoCurioso: 'Les Aztèques l\'ont fondée sur une île du lac Texcoco.', cat: 'historia' },
+  { year: 1215, evento: 'Magna Carta', datoCurioso: 'Considérée comme l\'une des bases du constitutionnalisme moderne.', cat: 'historia' },
+  { year: 1088, evento: 'Première université', datoCurioso: 'Bologne est née comme une association d\'étudiants, pas de professeurs.', cat: 'historia' },
+  { year: 1066, evento: 'Bataille de Hastings', datoCurioso: 'Elle a changé la langue et la culture de l\'Angleterre à jamais.', cat: 'historia' },
+  { year: 800, evento: 'Couronnement de Charlemagne', datoCurioso: 'Il a été couronné empereur le jour de Noël.', cat: 'historia' },
+  { year: 622, evento: 'L\'Hégire', datoCurioso: 'Marque le début du calendrier islamique.', cat: 'historia' },
+  { year: 476, evento: 'Chute de l\'Empire romain d\'Occident', datoCurioso: 'Le dernier empereur n\'avait que 16 ans.', cat: 'historia' },
+  // --- Antiquité ---
+  { year: 0, evento: 'An 1 du calendrier chrétien', datoCurioso: 'L\'« an 0 » n\'existe pas : on passe de l\'an 1 av. J.-C. à l\'an 1 apr. J.-C.', cat: 'historia' },
+  { year: -44, evento: 'Assassinat de Jules César', datoCurioso: 'Il a reçu 23 coups de poignard au Sénat romain.', cat: 'historia' },
+  { year: -221, evento: 'Unification de la Chine', datoCurioso: 'Le premier empereur a fait construire une armée de terre cuite pour sa tombe.', cat: 'historia' },
+  { year: -331, evento: 'Alexandre le Grand conquiert la Perse', datoCurioso: 'Il a bâti un empire de la Grèce jusqu\'à l\'Inde.', cat: 'historia' },
+  { year: -447, evento: 'Parthénon', datoCurioso: 'Ses colonnes sont légèrement courbées pour paraître parfaitement droites.', cat: 'historia' },
+  { year: -509, evento: 'Naissance de la République romaine', datoCurioso: 'Elle a duré près de 500 ans avant de devenir un empire.', cat: 'historia' },
+  { year: -563, evento: 'Naissance de Bouddha', datoCurioso: 'Il a renoncé à la vie de prince pour chercher l\'illumination.', cat: 'historia' },
+  { year: -776, evento: 'Premiers Jeux olympiques', datoCurioso: 'Organisés à Olympie ; seuls les hommes concouraient, nus.', cat: 'historia' },
+  { year: -1200, evento: 'Effondrement de l\'âge du bronze', datoCurioso: 'Plusieurs grandes civilisations méditerranéennes se sont effondrées presque simultanément.', cat: 'historia' },
+  // --- Civilisations anciennes ---
+  { year: -1750, evento: 'Code de Hammurabi', datoCurioso: 'C\'est l\'un des premiers ensembles de lois écrites de l\'histoire.', cat: 'historia' },
+  { year: -2000, evento: 'Civilisation minoenne', datoCurioso: 'Ils ont construit Cnossos, avec un labyrinthe qui a inspiré le mythe du Minotaure.', cat: 'historia' },
+  { year: -2560, evento: 'Grande Pyramide de Gizeh', datoCurioso: 'Quand elle a été construite, des mammouths laineux vivaient encore sur Terre.', cat: 'historia' },
+  { year: -3200, evento: 'Première écriture', datoCurioso: 'Née en Sumèrie : le premier système d\'écriture cunéiforme connu.', cat: 'historia' },
+  { year: -3300, evento: 'Âge du bronze', datoCurioso: 'Le bronze a permis des outils bien plus durs que la pierre.', cat: 'prehistoria' },
+  { year: -4000, evento: 'Premières villes (Uruk)', datoCurioso: 'Uruk a compté jusqu\'à 80 000 habitants, une métropole pour son époque.', cat: 'historia' },
+  // --- Préhistoire récente ---
+  { year: -7000, evento: 'Premières poteries', datoCurioso: 'Elles apparaissent presque simultanément dans plusieurs régions du monde.', cat: 'prehistoria' },
+  { year: -10000, evento: 'Début de l\'agriculture', datoCurioso: 'La Révolution néolithique fait passer l\'humanité du nomadisme à la sédentarité.', cat: 'prehistoria' },
+  { year: -12000, evento: 'Fin de la dernière glaciation', datoCurioso: 'Le niveau de la mer était environ 120 mètres plus bas qu\'aujourd\'hui.', cat: 'geologia' },
+  { year: -14000, evento: 'Domestication du chien', datoCurioso: 'C\'est le premier animal domestiqué par l\'être humain.', cat: 'biologia' },
+  { year: -30000, evento: 'Peintures de Chauvet', datoCurioso: 'Les plus anciennes d\'Europe, avec des lions, rhinocéros et ours.', cat: 'prehistoria' },
+  // --- Préhistoire profonde ---
+  { year: -40000, evento: 'Premier art figuratif', datoCurioso: 'Peintures d\'animaux dans des grottes d\'Indonésie et d\'Europe.', cat: 'prehistoria' },
+  { year: -70000, evento: 'Goulot d\'étranglement génétique', datoCurioso: 'Certaines études suggèrent que la population humaine est tombée à quelques milliers.', cat: 'biologia' },
+  { year: -100000, evento: 'Homo sapiens hors d\'Afrique', datoCurioso: 'Les premières migrations atteignaient déjà le Proche-Orient.', cat: 'prehistoria' },
+  { year: -200000, evento: 'Néandertaliens en Europe', datoCurioso: 'Ils ont coexisté avec Homo sapiens et se sont croisés génétiquement.', cat: 'prehistoria' },
+  { year: -300000, evento: 'Apparition d\'Homo sapiens', datoCurioso: 'Les fossiles les plus anciens connus sont du Maroc.', cat: 'biologia' },
+  { year: -400000, evento: 'Usage contrôlé du feu', datoCurioso: 'Il existe des preuves de foyers utilisés régulièrement à cette époque.', cat: 'prehistoria' },
+  { year: -700000, evento: 'Ancêtre commun humain/néandertalien', datoCurioso: 'Les deux espèces ont coexisté et se sont croisées des milliers d\'années plus tard.', cat: 'biologia' },
+  { year: -1000000, evento: 'Horizon d\'un million d\'années', datoCurioso: 'Le genre Homo s\'était déjà répandu dans une grande partie de l\'Afrique et de l\'Asie.', cat: 'prehistoria' },
+  { year: -2000000, evento: 'Homo erectus', datoCurioso: 'Le premier à utiliser des outils en pierre de manière systématique.', cat: 'prehistoria' },
+  { year: -3500000, evento: 'Australopithèque (Lucy)', datoCurioso: 'Son nom vient de la chanson des Beatles qu\'écoutaient les archéologues.', cat: 'biologia' },
+  // --- Temps géologique profond ---
+  { year: -2580000, evento: 'Début du Quaternaire', datoCurioso: 'Commence la période de glaciations répétées dans laquelle nous vivons encore.', cat: 'geologia' },
+  { year: -6000000, evento: 'Séparation humains/chimpanzés', datoCurioso: 'C\'est l\'estimation génétique du dernier ancêtre commun.', cat: 'biologia' },
+  { year: -23000000, evento: 'Début du Néogène', datoCurioso: 'Les grands singes se diversifient en Europe, en Asie et en Afrique.', cat: 'biologia' },
+  { year: -66000000, evento: 'Extinction des dinosaures', datoCurioso: 'Un astéroïde d\'environ 10 km a frappé ce qui est aujourd\'hui le Mexique.', cat: 'geologia' },
+  { year: -145000000, evento: 'Crétacé et premières fleurs', datoCurioso: 'Les premières plantes à fleurs apparaissent sur la planète.', cat: 'biologia' },
+  { year: -200000000, evento: 'Rupture de la Pangée', datoCurioso: 'Le supercontinent s\'est fragmenté en ce qui constitue les continents actuels.', cat: 'geologia' },
+  { year: -201000000, evento: 'Domination des dinosaures', datoCurioso: 'Après une extinction au Trias, les dinosaures dominent la Terre.', cat: 'biologia' },
+  { year: -230000000, evento: 'Premiers dinosaures', datoCurioso: 'Ils étaient petits et bipèdes, très différents des géants ultérieurs.', cat: 'biologia' },
+  { year: -252000000, evento: 'La Grande Extinction', datoCurioso: 'La plus grande extinction massive : près de 90 % des espèces marines ont disparu.', cat: 'geologia' },
+  { year: -375000000, evento: 'Vertébrés sur terre', datoCurioso: 'Des poissons à nageoires lobées (comme Tiktaalik) commencent à sortir de l\'eau.', cat: 'biologia' },
+  { year: -440000000, evento: 'Premières plantes terrestres', datoCurioso: 'Mousses et hépatiques ont été les premières à coloniser la terre.', cat: 'biologia' },
+  { year: -530000000, evento: 'Premiers poissons', datoCurioso: 'Les premiers vertébrés apparaissent dans les mers du Cambrien.', cat: 'biologia' },
+  { year: -541000000, evento: 'Explosion cambrienne', datoCurioso: 'En quelques millions d\'années, la plupart des grands groupes animaux émergent.', cat: 'biologia' },
+  { year: -2500000000, evento: 'Grande Oxydation', datoCurioso: 'Les cyanobactéries ont rempli l\'atmosphère d\'oxygène, changeant la Terre.', cat: 'geologia' },
+  { year: -3700000000, evento: 'Premiers indices de vie', datoCurioso: 'Ce sont les traces les plus anciennes de vie microbienne connues.', cat: 'biologia' },
+  { year: -4000000000, evento: 'Formation des océans', datoCurioso: 'L\'eau est arrivée sur Terre par des astéroïdes et des comètes.', cat: 'geologia' },
+  { year: -4600000000, evento: 'Formation de la Terre', datoCurioso: 'Elle s\'est formée à partir du disque de poussière et de gaz entourant le jeune Soleil.', cat: 'geologia' },
+  // --- Nouveaux événements ---
+  { year: -2400000, evento: 'Apparition du genre Homo', datoCurioso: 'Homo habilis est le premier à fabriquer systématiquement des outils en pierre.', cat: 'prehistoria' },
+  { year: -1900000, evento: 'Homo erectus sort d\'Afrique', datoCurioso: 'Première espèce humaine à parcourir de si longues distances, atteignant l\'Asie.', cat: 'prehistoria' },
+  { year: -430000, evento: 'Fossiles de Néandertal à Atapuerca', datoCurioso: 'Trouvés dans la Sima de los Huesos (Espagne), un site unique au monde.', cat: 'prehistoria' },
+  { year: -170000, evento: '« Ève mitochondriale » estimée', datoCurioso: 'L\'ancêtre commune la plus récente de tous les humains vivants en ligne maternelle.', cat: 'biologia' },
+  { year: -74000, evento: 'Éruption du supervolcan Toba', datoCurioso: 'Certaines études suggèrent qu\'elle a réduit drastiquement la population humaine mondiale.', cat: 'geologia' },
+  { year: -50000, evento: 'Premiers instruments de musique', datoCurioso: 'Flûtes sculptées dans des os d\'oiseaux et de l\'ivoire de mammouth.', cat: 'prehistoria' },
+  { year: -30000, evento: 'Dernière population néandertalienne', datoCurioso: 'Ils se sont éteints peu après avoir coexisté des milliers d\'années avec Homo sapiens.', cat: 'prehistoria' },
+  { year: -20000, evento: 'Maximum glaciaire', datoCurioso: 'Une grande partie de l\'Europe et de l\'Amérique du Nord était couverte d\'épaisses couches de glace.', cat: 'geologia' },
+  { year: -17000, evento: 'Peintures de Lascaux', datoCurioso: 'Découvertes par hasard en 1940, grâce à un chien tombé dans la grotte.', cat: 'prehistoria' },
+  { year: -9500, evento: 'Göbekli Tepe', datoCurioso: 'Le plus ancien temple monumental connu, construit avant l\'agriculture.', cat: 'historia' },
+  { year: -5500, evento: 'Invention de la roue', datoCurioso: 'D\'abord utilisée pour la poterie, pas pour le transport.', cat: 'historia' },
+  // --- Civilisations et Moyen Âge ---
+  { year: -3000, evento: 'Civilisation de la vallée de l\'Indus', datoCurioso: 'Ses villes avaient des systèmes d\'égouts plus avancés que beaucoup de villes médiévales.', cat: 'historia' },
+  { year: -1600, evento: 'Dynastie Shang en Chine', datoCurioso: 'Elle a laissé les premiers textes chinois écrits, gravés sur des os d\'oracle.', cat: 'historia' },
+  { year: -1200, evento: 'Civilisation olmèque', datoCurioso: 'La « culture mère » de la Mésoamérique ; elle a sculpté d\'énormes têtes de pierre.', cat: 'historia' },
+  { year: -563, evento: 'Naissance de Bouddha', datoCurioso: 'Son enseignement a donné naissance à l\'une des religions les plus pratiquées au monde.', cat: 'historia' },
+  { year: -268, evento: 'Empereur Ashoka (Inde)', datoCurioso: 'Après une guerre sanglante, il s\'est converti au bouddhisme et a renoncé aux conquêtes.', cat: 'historia' },
+  { year: 100, evento: 'Apogée de Teotihuacan', datoCurioso: 'Elle a compté plus de 100 000 habitants, l\'une des plus grandes villes du monde de son époque.', cat: 'historia' },
+  { year: 868, evento: 'Premier livre imprimé connu', datoCurioso: 'Le Sūtra du Diamant, imprimé en Chine avec des blocs de bois.', cat: 'historia' },
+  { year: 1206, evento: 'Gengis Khan fonde l\'Empire mongol', datoCurioso: 'Il est devenu le plus grand empire terrestre contigu de l\'histoire.', cat: 'historia' },
+  { year: 1324, evento: 'Pèlerinage de Mansa Moussa à La Mecque', datoCurioso: 'Il a distribué tant d\'or en chemin qu\'il en a fait baisser le cours en Égypte pendant des années.', cat: 'historia' },
+  // --- Époque moderne et contemporaine ---
+  { year: 1521, evento: 'Chute de l\'Empire aztèque', datoCurioso: 'Une alliance de forces espagnoles et de peuples indigènes rivaux a scellé la conquête.', cat: 'historia' },
+  { year: 1804, evento: 'Indépendance d\'Haïti', datoCurioso: 'La première république née d\'une révolte de personnes réduites en esclavage.', cat: 'historia' },
+  { year: 1885, evento: 'Conférence de Berlin', datoCurioso: 'Les puissances européennes se sont partagé l\'Afrique sur une carte sans participation africaine.', cat: 'historia' },
+  { year: 1903, evento: 'Premier vol (frères Wright)', datoCurioso: 'Il n\'a duré que 12 secondes et a couvert moins que la longueur d\'un avion moderne.', cat: 'historia' },
+  { year: 1917, evento: 'Révolution russe', datoCurioso: 'Elle a mis fin à des siècles de pouvoir tsariste en quelques mois.', cat: 'historia' },
+  { year: 1947, evento: 'Indépendance de l\'Inde', datoCurioso: 'Accompagnée d\'une partition qui a déplacé des millions de personnes.', cat: 'historia' },
+  { year: 1957, evento: 'Lancement du Spoutnik', datoCurioso: 'Le premier objet fabriqué par l\'homme à orbiter autour de la Terre.', cat: 'historia' },
+  { year: 1994, evento: 'Fin de l\'apartheid en Afrique du Sud', datoCurioso: 'Nelson Mandela, emprisonné 27 ans, a été élu président la même année.', cat: 'historia' },
+].sort((a, b) => b.year - a.year);
+
+const EVENTS_IT = [
+  // --- XXI secolo ---
+  { year: 2024, evento: 'Ascesa dell\'IA generativa', datoCurioso: 'ChatGPT ha raggiunto 100 milioni di utenti in soli 2 mesi.', cat: 'historia' },
+  { year: 2020, evento: 'Pandemia di COVID-19', datoCurioso: 'L\'OMS l\'ha dichiarata pandemia globale l\'11 marzo 2020.', cat: 'biologia' },
+  { year: 2012, evento: 'Scoperta del bosone di Higgs', datoCurioso: 'Peter Higgs ne aveva predetto l\'esistenza nel 1964, quasi 50 anni prima della conferma.', cat: 'historia' },
+  { year: 2007, evento: 'Presentazione dell\'iPhone', datoCurioso: 'Steve Jobs lo descrisse come «un iPod, un telefono e Internet».', cat: 'historia' },
+  { year: 2001, evento: 'Attentati dell\'11 settembre', datoCurioso: 'Le Torri Gemelle hanno richiesto 7 anni per essere costruite e 102 minuti per crollare.', cat: 'historia' },
+  // --- XX secolo ---
+  { year: 1991, evento: 'Dissoluzione dell\'Unione Sovietica', datoCurioso: 'L\'URSS si è ufficialmente dissolta il giorno di Natale del 1991.', cat: 'historia' },
+  { year: 1989, evento: 'Caduta del Muro di Berlino', datoCurioso: 'È caduto a causa di un errore di comunicazione durante una conferenza stampa.', cat: 'historia' },
+  { year: 1986, evento: 'Disastro di Chernobyl', datoCurioso: 'La zona di esclusione di 30 km resta disabitata ed è diventata un rifugio per la fauna selvatica.', cat: 'historia' },
+  { year: 1977, evento: 'Lancio della sonda Voyager 1', datoCurioso: 'Continua a inviare dati dallo spazio interstellare, a oltre 24 miliardi di km.', cat: 'geologia' },
+  { year: 1969, evento: 'Allunaggio', datoCurioso: 'Il computer dell\'Apollo 11 aveva meno potenza di una calcolatrice moderna.', cat: 'geologia' },
+  { year: 1961, evento: 'Jurij Gagarin nello spazio', datoCurioso: 'Il volo è durato solo 108 minuti e ha completato una singola orbita intorno alla Terra.', cat: 'historia' },
+  { year: 1953, evento: 'Struttura del DNA', datoCurioso: 'La foto chiave (Foto 51) fu scattata da Rosalind Franklin.', cat: 'biologia' },
+  { year: 1945, evento: 'Fine della Seconda guerra mondiale', datoCurioso: 'Quello stesso anno fu fondata l\'ONU, con 51 paesi membri.', cat: 'historia' },
+  { year: 1939, evento: 'Inizio della Seconda guerra mondiale', datoCurioso: 'Il conflitto più letale della storia: tra 70 e 85 milioni di morti.', cat: 'historia' },
+  { year: 1928, evento: 'Scoperta della penicillina', datoCurioso: 'Alexander Fleming la trovò per caso in una coltura dimenticata.', cat: 'biologia' },
+  { year: 1914, evento: 'Inizio della Prima guerra mondiale', datoCurioso: 'L\'assassinio di un arciduca scatenò un conflitto tra 30 nazioni.', cat: 'historia' },
+  { year: 1903, evento: 'Primo volo (fratelli Wright)', datoCurioso: 'Durò solo 12 secondi e coprì 37 metri.', cat: 'historia' },
+  // --- XIX secolo ---
+  { year: 1889, evento: 'Torre Eiffel', datoCurioso: 'Costruita come ingresso temporaneo per l\'Esposizione universale di Parigi.', cat: 'historia' },
+  { year: 1876, evento: 'Telefono', datoCurioso: 'Elisha Gray presentò un brevetto simile lo stesso giorno, poche ore dopo.', cat: 'historia' },
+  { year: 1869, evento: 'Tavola periodica di Mendeleev', datoCurioso: 'Predisse l\'esistenza di elementi non ancora scoperti e ci azzeccò.', cat: 'historia' },
+  { year: 1859, evento: 'Pubblicazione de «L\'origine delle specie»', datoCurioso: 'Esaurito il primo giorno di vendita.', cat: 'biologia' },
+  { year: 1804, evento: 'Napoleone imperatore', datoCurioso: 'Si incoronò da solo, togliendo la corona dalle mani del papa.', cat: 'historia' },
+  // --- XVI-XVIII secolo ---
+  { year: 1789, evento: 'Rivoluzione francese', datoCurioso: 'Il calendario rivoluzionario aveva settimane di 10 giorni.', cat: 'historia' },
+  { year: 1776, evento: 'Indipendenza degli Stati Uniti', datoCurioso: 'Jefferson impiegò 17 giorni per scrivere la Dichiarazione.', cat: 'historia' },
+  { year: 1687, evento: 'Leggi di Newton', datoCurioso: 'Nei «Principia» formula la legge della gravitazione universale.', cat: 'geologia' },
+  { year: 1608, evento: 'Telescopio', datoCurioso: 'Galileo lo migliorò un anno dopo e lo puntò verso il cielo.', cat: 'historia' },
+  { year: 1543, evento: 'Rivoluzione copernicana', datoCurioso: 'Il libro che affermava che la Terra ruota intorno al Sole fu pubblicato l\'anno della sua morte.', cat: 'geologia' },
+  { year: 1492, evento: 'Arrivo in America', datoCurioso: 'Colombo morì convinto di aver raggiunto l\'Asia.', cat: 'historia' },
+  { year: 1440, evento: 'Stampa (Gutenberg)', datoCurioso: 'La sua prima grande opera fu la Bibbia a 42 righe.', cat: 'historia' },
+  // --- Medioevo ---
+  { year: 1347, evento: 'Peste nera', datoCurioso: 'Uccise un terzo della popolazione europea in appena sei anni.', cat: 'biologia' },
+  { year: 1325, evento: 'Fondazione di Tenochtitlan', datoCurioso: 'Gli Aztechi la fondarono su un\'isola nel lago Texcoco.', cat: 'historia' },
+  { year: 1215, evento: 'Magna Carta', datoCurioso: 'Considerata una delle basi del costituzionalismo moderno.', cat: 'historia' },
+  { year: 1088, evento: 'Prima università', datoCurioso: 'Bologna nacque come un\'associazione di studenti, non di professori.', cat: 'historia' },
+  { year: 1066, evento: 'Battaglia di Hastings', datoCurioso: 'Cambiò la lingua e la cultura dell\'Inghilterra per sempre.', cat: 'historia' },
+  { year: 800, evento: 'Incoronazione di Carlo Magno', datoCurioso: 'Fu incoronato imperatore il giorno di Natale.', cat: 'historia' },
+  { year: 622, evento: 'L\'Egira', datoCurioso: 'Segna l\'inizio del calendario islamico.', cat: 'historia' },
+  { year: 476, evento: 'Caduta dell\'Impero romano d\'Occidente', datoCurioso: 'L\'ultimo imperatore aveva solo 16 anni.', cat: 'historia' },
+  // --- Antichità ---
+  { year: 0, evento: 'Anno 1 del calendario cristiano', datoCurioso: 'L\'«anno 0» non esiste: si passa dall\'1 a.C. all\'1 d.C.', cat: 'historia' },
+  { year: -44, evento: 'Assassinio di Giulio Cesare', datoCurioso: 'Ricevette 23 pugnalate nel Senato romano.', cat: 'historia' },
+  { year: -221, evento: 'Unificazione della Cina', datoCurioso: 'Il primo imperatore fece costruire un esercito di terracotta per la sua tomba.', cat: 'historia' },
+  { year: -331, evento: 'Alessandro Magno conquista la Persia', datoCurioso: 'Costruì un impero dalla Grecia all\'India.', cat: 'historia' },
+  { year: -447, evento: 'Partenone', datoCurioso: 'Le sue colonne sono leggermente curve per apparire perfettamente dritte.', cat: 'historia' },
+  { year: -509, evento: 'Nascita della Repubblica romana', datoCurioso: 'Durò quasi 500 anni prima di diventare un impero.', cat: 'historia' },
+  { year: -563, evento: 'Nascita di Buddha', datoCurioso: 'Rinunciò alla vita da principe per cercare l\'illuminazione.', cat: 'historia' },
+  { year: -776, evento: 'Primi Giochi olimpici', datoCurioso: 'Si svolgevano a Olimpia; gareggiavano solo uomini, nudi.', cat: 'historia' },
+  { year: -1200, evento: 'Crollo dell\'età del bronzo', datoCurioso: 'Diverse grandi civiltà del Mediterraneo crollarono quasi contemporaneamente.', cat: 'historia' },
+  // --- Civiltà antiche ---
+  { year: -1750, evento: 'Codice di Hammurabi', datoCurioso: 'È uno dei primi insiemi di leggi scritte della storia.', cat: 'historia' },
+  { year: -2000, evento: 'Civiltà minoica', datoCurioso: 'Costruirono Cnosso, con un labirinto che ispirò il mito del Minotauro.', cat: 'historia' },
+  { year: -2560, evento: 'Grande Piramide di Giza', datoCurioso: 'Quando fu costruita, i mammut lanosi vivevano ancora sulla Terra.', cat: 'historia' },
+  { year: -3200, evento: 'Prima scrittura', datoCurioso: 'Nata in Sumeria: il primo sistema di scrittura cuneiforme conosciuto.', cat: 'historia' },
+  { year: -3300, evento: 'Età del bronzo', datoCurioso: 'Il bronzo ha permesso strumenti molto più duri della pietra.', cat: 'prehistoria' },
+  { year: -4000, evento: 'Prime città (Uruk)', datoCurioso: 'Uruk arrivò a contare 80.000 abitanti, una metropoli per la sua epoca.', cat: 'historia' },
+  // --- Preistoria recente ---
+  { year: -7000, evento: 'Prime ceramiche', datoCurioso: 'Appaiono quasi simultaneamente in diverse regioni del mondo.', cat: 'prehistoria' },
+  { year: -10000, evento: 'Inizio dell\'agricoltura', datoCurioso: 'La Rivoluzione neolitica segna il passaggio dell\'umanità da nomade a sedentaria.', cat: 'prehistoria' },
+  { year: -12000, evento: 'Fine dell\'ultima glaciazione', datoCurioso: 'Il livello del mare era circa 120 metri più basso di oggi.', cat: 'geologia' },
+  { year: -14000, evento: 'Addomesticamento del cane', datoCurioso: 'È il primo animale addomesticato dall\'essere umano.', cat: 'biologia' },
+  { year: -30000, evento: 'Pitture di Chauvet', datoCurioso: 'Le più antiche d\'Europa, con leoni, rinoceronti e orsi.', cat: 'prehistoria' },
+  // --- Preistoria profonda ---
+  { year: -40000, evento: 'Prima arte figurativa', datoCurioso: 'Pitture di animali nelle grotte dell\'Indonesia e dell\'Europa.', cat: 'prehistoria' },
+  { year: -70000, evento: 'Collo di bottiglia genetico', datoCurioso: 'Alcuni studi suggeriscono che la popolazione umana si ridusse a poche migliaia.', cat: 'biologia' },
+  { year: -100000, evento: 'Homo sapiens fuori dall\'Africa', datoCurioso: 'Le prime migrazioni raggiungevano già il Vicino Oriente.', cat: 'prehistoria' },
+  { year: -200000, evento: 'Neanderthal in Europa', datoCurioso: 'Coesistettero con Homo sapiens e si incrociarono geneticamente.', cat: 'prehistoria' },
+  { year: -300000, evento: 'Comparsa di Homo sapiens', datoCurioso: 'I fossili più antichi conosciuti sono del Marocco.', cat: 'biologia' },
+  { year: -400000, evento: 'Uso controllato del fuoco', datoCurioso: 'Esistono prove di focolari usati regolarmente in questo periodo.', cat: 'prehistoria' },
+  { year: -700000, evento: 'Antenato comune umano/neanderthal', datoCurioso: 'Entrambe le specie coesistettero e si incrociarono migliaia di anni dopo.', cat: 'biologia' },
+  { year: -1000000, evento: 'Orizzonte di un milione di anni', datoCurioso: 'Il genere Homo si era già diffuso in gran parte dell\'Africa e dell\'Asia.', cat: 'prehistoria' },
+  { year: -2000000, evento: 'Homo erectus', datoCurioso: 'Il primo a utilizzare sistematicamente strumenti in pietra.', cat: 'prehistoria' },
+  { year: -3500000, evento: 'Australopiteco (Lucy)', datoCurioso: 'Il suo nome viene dalla canzone dei Beatles che ascoltavano gli archeologi.', cat: 'biologia' },
+  // --- Tempo geologico profondo ---
+  { year: -2580000, evento: 'Inizio del Quaternario', datoCurioso: 'Inizia il periodo di glaciazioni ripetute in cui viviamo ancora oggi.', cat: 'geologia' },
+  { year: -6000000, evento: 'Separazione umani/scimpanzé', datoCurioso: 'È la stima genetica dell\'ultimo antenato comune.', cat: 'biologia' },
+  { year: -23000000, evento: 'Inizio del Neogene', datoCurioso: 'Le grandi scimmie si diversificano in Europa, Asia e Africa.', cat: 'biologia' },
+  { year: -66000000, evento: 'Estinzione dei dinosauri', datoCurioso: 'Un asteroide di circa 10 km ha colpito quello che oggi è il Messico.', cat: 'geologia' },
+  { year: -145000000, evento: 'Cretaceo e primi fiori', datoCurioso: 'Le prime piante con fiori compaiono sul pianeta.', cat: 'biologia' },
+  { year: -200000000, evento: 'Rottura della Pangea', datoCurioso: 'Il supercontinente si è frammentato in quelli che oggi sono i continenti attuali.', cat: 'geologia' },
+  { year: -201000000, evento: 'Dominio dei dinosauri', datoCurioso: 'Dopo un\'estinzione nel Triassico, i dinosauri dominano la Terra.', cat: 'biologia' },
+  { year: -230000000, evento: 'Primi dinosauri', datoCurioso: 'Erano piccoli e bipedi, molto diversi dai giganti successivi.', cat: 'biologia' },
+  { year: -252000000, evento: 'La Grande Moria', datoCurioso: 'La più grande estinzione di massa: morì circa il 90% delle specie marine.', cat: 'geologia' },
+  { year: -375000000, evento: 'Vertebrati sulla terraferma', datoCurioso: 'Pesci con pinne robuste (come Tiktaalik) cominciano a uscire dall\'acqua.', cat: 'biologia' },
+  { year: -440000000, evento: 'Prime piante terrestri', datoCurioso: 'Muschi e epatiche furono i primi a colonizzare la terraferma.', cat: 'biologia' },
+  { year: -530000000, evento: 'Primi pesci', datoCurioso: 'I primi vertebrati compaiono nei mari del Cambriano.', cat: 'biologia' },
+  { year: -541000000, evento: 'Esplosione cambriana', datoCurioso: 'In pochi milioni di anni emergono la maggior parte dei grandi gruppi animali.', cat: 'biologia' },
+  { year: -2500000000, evento: 'Grande Ossidazione', datoCurioso: 'I cianobatteri riempirono l\'atmosfera di ossigeno, cambiando la Terra.', cat: 'geologia' },
+  { year: -3700000000, evento: 'Primi indizi di vita', datoCurioso: 'Sono le tracce più antiche di vita microbica conosciute.', cat: 'biologia' },
+  { year: -4000000000, evento: 'Formazione degli oceani', datoCurioso: 'L\'acqua è arrivata sulla Terra attraverso asteroidi e comete.', cat: 'geologia' },
+  { year: -4600000000, evento: 'Formazione della Terra', datoCurioso: 'Si è formata dal disco di polvere e gas che circondava il giovane Sole.', cat: 'geologia' },
+  // --- Nuovi eventi ---
+  { year: -2400000, evento: 'Comparsa del genere Homo', datoCurioso: 'Homo habilis è il primo a fabbricare sistematicamente strumenti in pietra.', cat: 'prehistoria' },
+  { year: -1900000, evento: 'Homo erectus esce dall\'Africa', datoCurioso: 'Prima specie umana a percorrere distanze così grandi, raggiungendo l\'Asia.', cat: 'prehistoria' },
+  { year: -430000, evento: 'Fossili di Neanderthal ad Atapuerca', datoCurioso: 'Trovati nella Sima de los Huesos (Spagna), un sito unico al mondo.', cat: 'prehistoria' },
+  { year: -170000, evento: '«Eva mitocondriale» stimata', datoCurioso: 'L\'antenata comune più recente di tutti gli esseri umani viventi per linea materna.', cat: 'biologia' },
+  { year: -74000, evento: 'Eruzione del supervulcano Toba', datoCurioso: 'Alcuni studi suggeriscono che ha ridotto drasticamente la popolazione umana mondiale.', cat: 'geologia' },
+  { year: -50000, evento: 'Primi strumenti musicali', datoCurioso: 'Flauti intagliati in ossa di uccello e avorio di mammut.', cat: 'prehistoria' },
+  { year: -30000, evento: 'Ultima popolazione neanderthaliana', datoCurioso: 'Si estinsero poco dopo aver coesistito per millenni con l\'Homo sapiens.', cat: 'prehistoria' },
+  { year: -20000, evento: 'Massimo glaciale', datoCurioso: 'Gran parte dell\'Europa e del Nord America era coperta da spesse coltri di ghiaccio.', cat: 'geologia' },
+  { year: -17000, evento: 'Pitture di Lascaux', datoCurioso: 'Scoperte per caso nel 1940, grazie a un cane caduto nella grotta.', cat: 'prehistoria' },
+  { year: -9500, evento: 'Göbekli Tepe', datoCurioso: 'Il tempio monumentale più antico conosciuto, costruito prima dell\'agricoltura.', cat: 'historia' },
+  { year: -5500, evento: 'Invenzione della ruota', datoCurioso: 'Usata per la prima volta per la ceramica, non per il trasporto.', cat: 'historia' },
+  // --- Civiltà e Medioevo ---
+  { year: -3000, evento: 'Civiltà della valle dell\'Indo', datoCurioso: 'Le sue città avevano sistemi fognari più avanzati di molte città medievali.', cat: 'historia' },
+  { year: -1600, evento: 'Dinastia Shang in Cina', datoCurioso: 'Ha lasciato i primi testi scritti cinesi, incisi su ossa oracolari.', cat: 'historia' },
+  { year: -1200, evento: 'Civiltà olmeca', datoCurioso: 'La «cultura madre» della Mesoamerica; scolpì enormi teste di pietra.', cat: 'historia' },
+  { year: -563, evento: 'Nascita di Buddha', datoCurioso: 'Il suo insegnamento ha dato origine a una delle religioni più praticate al mondo.', cat: 'historia' },
+  { year: -268, evento: 'Imperatore Ashoka (India)', datoCurioso: 'Dopo una guerra sanguinosa, si convertì al buddhismo e rinunciò a nuove conquiste.', cat: 'historia' },
+  { year: 100, evento: 'Apogeo di Teotihuacan', datoCurioso: 'Raggiunse oltre 100.000 abitanti, una delle città più grandi del mondo dell\'epoca.', cat: 'historia' },
+  { year: 868, evento: 'Primo libro stampato conosciuto', datoCurioso: 'Il Sutra del Diamante, stampato in Cina con blocchi di legno.', cat: 'historia' },
+  { year: 1206, evento: 'Gengis Khan fonda l\'Impero mongolo', datoCurioso: 'Divenne il più grande impero terrestre contiguo della storia.', cat: 'historia' },
+  { year: 1324, evento: 'Pellegrinaggio di Mansa Musa alla Mecca', datoCurioso: 'Distribuì tanto oro lungo il cammino da svalutarne il prezzo in Egitto per anni.', cat: 'historia' },
+  // --- Epoca moderna e contemporanea ---
+  { year: 1521, evento: 'Caduta dell\'Impero azteco', datoCurioso: 'Un\'alleanza di forze spagnole e popoli indigeni rivali ha sancito la conquista.', cat: 'historia' },
+  { year: 1804, evento: 'Indipendenza di Haiti', datoCurioso: 'La prima repubblica nata da una rivolta di persone schiavizzate.', cat: 'historia' },
+  { year: 1885, evento: 'Conferenza di Berlino', datoCurioso: 'Le potenze europee si sono spartite l\'Africa su una mappa senza partecipazione africana.', cat: 'historia' },
+  { year: 1903, evento: 'Primo volo (fratelli Wright)', datoCurioso: 'Durò solo 12 secondi e coprì meno della lunghezza di un aereo moderno.', cat: 'historia' },
+  { year: 1917, evento: 'Rivoluzione russa', datoCurioso: 'Pose fine a secoli di governo zarista in pochi mesi.', cat: 'historia' },
+  { year: 1947, evento: 'Indipendenza dell\'India', datoCurioso: 'Accompagnata da una partizione che ha sfollato milioni di persone.', cat: 'historia' },
+  { year: 1957, evento: 'Lancio dello Sputnik', datoCurioso: 'Il primo oggetto fabbricato dall\'uomo a orbitare intorno alla Terra.', cat: 'historia' },
+  { year: 1994, evento: 'Fine dell\'apartheid in Sudafrica', datoCurioso: 'Nelson Mandela, imprigionato per 27 anni, fu eletto presidente quello stesso anno.', cat: 'historia' },
+].sort((a, b) => b.year - a.year);
+
+const EVENTS_CA = [
+  // --- Segle XXI ---
+  { year: 2024, evento: 'Auge de la IA generativa', datoCurioso: 'ChatGPT va assolir 100 milions d\'usuaris en només 2 mesos.', cat: 'historia' },
+  { year: 2020, evento: 'Pandèmia de COVID-19', datoCurioso: 'L\'OMS la va declarar pandèmia global l\'11 de març de 2020.', cat: 'biologia' },
+  { year: 2012, evento: 'Descobriment del bosó de Higgs', datoCurioso: 'Peter Higgs en va predir l\'existència el 1964, gairebé 50 anys abans de confirmar-se.', cat: 'historia' },
+  { year: 2007, evento: 'Es presenta l\'iPhone', datoCurioso: 'Steve Jobs el va descriure com «un iPod, un telèfon i Internet».', cat: 'historia' },
+  { year: 2001, evento: 'Atemptats de l\'11 de setembre', datoCurioso: 'Les Torres Bessones van trigar 7 anys a construir-se i 102 minuts a caure.', cat: 'historia' },
+  // --- Segle XX ---
+  { year: 1991, evento: 'Dissolució de la Unió Soviètica', datoCurioso: 'L\'URSS es va dissoldre oficialment el dia de Nadal de 1991.', cat: 'historia' },
+  { year: 1989, evento: 'Caiguda del Mur de Berlín', datoCurioso: 'Va caure per un error de comunicació en una roda de premsa.', cat: 'historia' },
+  { year: 1986, evento: 'Desastre de Txernòbil', datoCurioso: 'La zona d\'exclusió de 30 km segueix deshabitada i s\'ha convertit en refugi de fauna silvestre.', cat: 'historia' },
+  { year: 1977, evento: 'Es llança la sonda Voyager 1', datoCurioso: 'Continua enviant dades des de l\'espai interestelar a més de 24.000 milions de km.', cat: 'geologia' },
+  { year: 1969, evento: 'Arribada a la Lluna', datoCurioso: 'L\'ordinador de l\'Apol·lo 11 tenia menys potència que una calculadora actual.', cat: 'geologia' },
+  { year: 1961, evento: 'Iuri Gagarin a l\'espai', datoCurioso: 'El vol va durar només 108 minuts i va fer una sola òrbita a la Terra.', cat: 'historia' },
+  { year: 1953, evento: 'Estructura de l\'ADN', datoCurioso: 'La foto clau (Foto 51) va ser feta per Rosalind Franklin.', cat: 'biologia' },
+  { year: 1945, evento: 'Fi de la Segona Guerra Mundial', datoCurioso: 'Aquell mateix any es va fundar l\'ONU, amb 51 països membres.', cat: 'historia' },
+  { year: 1939, evento: 'Inici de la Segona Guerra Mundial', datoCurioso: 'El conflicte més mortífer de la història: entre 70 i 85 milions de morts.', cat: 'historia' },
+  { year: 1928, evento: 'Descobriment de la penicil·lina', datoCurioso: 'Alexander Fleming la va trobar per accident en un cultiu oblidat.', cat: 'biologia' },
+  { year: 1914, evento: 'Inici de la Primera Guerra Mundial', datoCurioso: 'L\'assassinat d\'un arxiduc va desencadenar un conflicte entre 30 nacions.', cat: 'historia' },
+  { year: 1903, evento: 'Primer vol (germans Wright)', datoCurioso: 'Va durar només 12 segons i va recórrer 37 metres.', cat: 'historia' },
+  // --- Segle XIX ---
+  { year: 1889, evento: 'Torre Eiffel', datoCurioso: 'Es va construir com a entrada temporal per a l\'Exposició Universal de París.', cat: 'historia' },
+  { year: 1876, evento: 'Telèfon', datoCurioso: 'Elisha Gray va presentar una patent similar el mateix dia, només unes hores després.', cat: 'historia' },
+  { year: 1869, evento: 'Taula periòdica de Mendeléiev', datoCurioso: 'Va predir l\'existència d\'elements encara no descoberts i va encertar.', cat: 'historia' },
+  { year: 1859, evento: 'Publicació de «L\'origen de les espècies»', datoCurioso: 'Es va esgotar el primer dia de venda.', cat: 'biologia' },
+  { year: 1804, evento: 'Napoleó emperador', datoCurioso: 'Es va coronar a si mateix, prenent la corona de les mans del papa.', cat: 'historia' },
+  // --- Segles XVI a XVIII ---
+  { year: 1789, evento: 'Revolució Francesa', datoCurioso: 'El calendari revolucionari va arribar a tenir setmanes de 10 dies.', cat: 'historia' },
+  { year: 1776, evento: 'Independència dels EUA', datoCurioso: 'Jefferson va trigar 17 dies a escriure la Declaració.', cat: 'historia' },
+  { year: 1687, evento: 'Lleis de Newton', datoCurioso: 'Als «Principia» formula la llei de la gravitació universal.', cat: 'geologia' },
+  { year: 1608, evento: 'Telescopi', datoCurioso: 'Galileu el va millorar un any després i el va apuntar al cel.', cat: 'historia' },
+  { year: 1543, evento: 'Revolució Copernicana', datoCurioso: 'El llibre que afirmava que la Terra gira al voltant del Sol es va publicar l\'any de la seva mort.', cat: 'geologia' },
+  { year: 1492, evento: 'Arribada a Amèrica', datoCurioso: 'Colom va morir convençut que havia arribat a Àsia.', cat: 'historia' },
+  { year: 1440, evento: 'Impremta (Gutenberg)', datoCurioso: 'La seva primera gran obra va ser la Bíblia de 42 línies.', cat: 'historia' },
+  // --- Edat Mitjana ---
+  { year: 1347, evento: 'Pesta Negra', datoCurioso: 'Va matar un terç de la població europea en tot just sis anys.', cat: 'biologia' },
+  { year: 1325, evento: 'Fundació de Tenochtitlan', datoCurioso: 'Els asteques la van fundar sobre una illa al llac Texcoco.', cat: 'historia' },
+  { year: 1215, evento: 'Carta Magna', datoCurioso: 'Considerada una de les bases del constitucionalisme modern.', cat: 'historia' },
+  { year: 1088, evento: 'Primera universitat', datoCurioso: 'Bolonya neix com una agrupació d\'estudiants, no de professors.', cat: 'historia' },
+  { year: 1066, evento: 'Batalla de Hastings', datoCurioso: 'Va canviar l\'idioma i la cultura d\'Anglaterra per sempre.', cat: 'historia' },
+  { year: 800, evento: 'Coronació de Carlemany', datoCurioso: 'Va ser coronat emperador el dia de Nadal.', cat: 'historia' },
+  { year: 622, evento: 'L\'Hègira', datoCurioso: 'Marca l\'inici del calendari islàmic.', cat: 'historia' },
+  { year: 476, evento: 'Caiguda de Roma d\'Occident', datoCurioso: 'L\'últim emperador tenia apenas 16 anys.', cat: 'historia' },
+  // --- Antiguitat ---
+  { year: 0, evento: 'Any 1 del calendari cristià', datoCurioso: 'L\'«any 0» no existeix: es passa de l\'1 aC a l\'1 dC.', cat: 'historia' },
+  { year: -44, evento: 'Assassinat de Juli Cèsar', datoCurioso: 'Va rebre 23 punyalades al Senat romà.', cat: 'historia' },
+  { year: -221, evento: 'Unificació de la Xina', datoCurioso: 'El primer emperador va manar construir un exèrcit de terracota per a la seva tomba.', cat: 'historia' },
+  { year: -331, evento: 'Alexandre el Gran conquesta Pèrsia', datoCurioso: 'Va construir un imperi des de Grècia fins a l\'Índia.', cat: 'historia' },
+  { year: -447, evento: 'Partenó', datoCurioso: 'Les seves columnes es corben lleugerament per semblar perfectament rectes.', cat: 'historia' },
+  { year: -509, evento: 'Neix la República Romana', datoCurioso: 'Va durar gairebé 500 anys abans de convertir-se en un imperi.', cat: 'historia' },
+  { year: -563, evento: 'Naixement de Buda', datoCurioso: 'Va renunciar a la vida de príncep per buscar la il·luminació.', cat: 'historia' },
+  { year: -776, evento: 'Primers Jocs Olímpics', datoCurioso: 'Se celebraven a Olímpia i només competien homes, nus.', cat: 'historia' },
+  { year: -1200, evento: 'Col·lapse de l\'Edat del Bronze', datoCurioso: 'Diverses grans civilitzacions del Mediterrani van caure gairebé alhora.', cat: 'historia' },
+  // --- Civilitzacions antigues ---
+  { year: -1750, evento: 'Codi d\'Hammurabi', datoCurioso: 'És un dels primers conjunts de lleis escrites de la història.', cat: 'historia' },
+  { year: -2000, evento: 'Civilització minoica', datoCurioso: 'Van construir Cnossos, amb un laberint que va inspirar el mite del Minotaure.', cat: 'historia' },
+  { year: -2560, evento: 'Gran Piràmide de Guiza', datoCurioso: 'Quan es va construir, encara quedaven mamuts llanuts vius a la Terra.', cat: 'historia' },
+  { year: -3200, evento: 'Primera escriptura', datoCurioso: 'Neix a Sumèria: és el primer sistema d\'escriptura cuneïforme conegut.', cat: 'historia' },
+  { year: -3300, evento: 'Edat del Bronze', datoCurioso: 'El bronze va permetre eines molt més dures que la pedra.', cat: 'prehistoria' },
+  { year: -4000, evento: 'Primeres ciutats (Uruk)', datoCurioso: 'Uruk va arribar a tenir fins a 80.000 habitants, una metròpoli per a la seva època.', cat: 'historia' },
+  // --- Prehistòria recent ---
+  { year: -7000, evento: 'Primeres ceràmiques', datoCurioso: 'Apareixen gairebé al mateix temps en diverses regions del món.', cat: 'prehistoria' },
+  { year: -10000, evento: 'Inici de l\'agricultura', datoCurioso: 'La Revolució Neolítica canvia la humanitat de nòmada a sedentària.', cat: 'prehistoria' },
+  { year: -12000, evento: 'Fi de l\'última glaciació', datoCurioso: 'El nivell del mar era uns 120 metres més baix que avui.', cat: 'geologia' },
+  { year: -14000, evento: 'Domesticació del gos', datoCurioso: 'És el primer animal domesticat per l\'ésser humà.', cat: 'biologia' },
+  { year: -30000, evento: 'Pintures de Chauvet', datoCurioso: 'Són les més antigues d\'Europa, amb lleons, rinoceronts i ossos.', cat: 'prehistoria' },
+  // --- Prehistòria profunda ---
+  { year: -40000, evento: 'Primer art figuratiu', datoCurioso: 'Pintures d\'animals en coves d\'Indonèsia i Europa.', cat: 'prehistoria' },
+  { year: -70000, evento: 'Coll d\'ampolla genètic', datoCurioso: 'Alguns estudis suggereixen que la població humana va baixar a uns pocs milers.', cat: 'biologia' },
+  { year: -100000, evento: 'Homo sapiens fora d\'Àfrica', datoCurioso: 'Les primeres migracions ja arribaven fins a l\'Orient Pròxim.', cat: 'prehistoria' },
+  { year: -200000, evento: 'Neandertals a Europa', datoCurioso: 'Van conviure amb Homo sapiens i es van creuar genèticament.', cat: 'prehistoria' },
+  { year: -300000, evento: 'Aparició de l\'Homo sapiens', datoCurioso: 'Els fòssils més antics coneguts són del Marroc.', cat: 'biologia' },
+  { year: -400000, evento: 'Ús controlat del foc', datoCurioso: 'Hi ha evidència de llars usades de forma regular en aquesta època.', cat: 'prehistoria' },
+  { year: -700000, evento: 'Avantpassat comú humà/neandertal', datoCurioso: 'Ambdues espècies van conviure i es van creuar milers d\'anys després.', cat: 'biologia' },
+  { year: -1000000, evento: 'Horitzó d\'un milió d\'anys', datoCurioso: 'El gènere Homo ja s\'havia estès per bona part d\'Àfrica i Àsia.', cat: 'prehistoria' },
+  { year: -2000000, evento: 'Homo erectus', datoCurioso: 'Va ser el primer a utilitzar eines de pedra de forma sistemàtica.', cat: 'prehistoria' },
+  { year: -3500000, evento: 'Australopithecus (Lucy)', datoCurioso: 'El seu nom ve de la cançó dels Beatles que escoltaven els arqueòlegs.', cat: 'biologia' },
+  // --- Temps geològic profund ---
+  { year: -2580000, evento: 'Inici del Quaternari', datoCurioso: 'Comença el període de glaciacions repetides en què encara ens trobem avui.', cat: 'geologia' },
+  { year: -6000000, evento: 'Separació humans/ximpanzés', datoCurioso: 'És l\'estimació genètica de l\'últim avantpassat comú.', cat: 'biologia' },
+  { year: -23000000, evento: 'Inici del Neogen', datoCurioso: 'Els grans simis es diversifiquen per Europa, Àsia i Àfrica.', cat: 'biologia' },
+  { year: -66000000, evento: 'Extinció dels dinosaures', datoCurioso: 'Un asteroide d\'uns 10 km va colpejar el que avui és Mèxic.', cat: 'geologia' },
+  { year: -145000000, evento: 'Cretaci i primeres flors', datoCurioso: 'Apareixen les primeres plantes amb flors al planeta.', cat: 'biologia' },
+  { year: -200000000, evento: 'Ruptura de Pangea', datoCurioso: 'El supercontinent es va fragmentar en el que avui són els continents actuals.', cat: 'geologia' },
+  { year: -201000000, evento: 'Domini dels dinosaures', datoCurioso: 'Després d\'una extinció al Triàsic, els dinosaures dominen la Terra.', cat: 'biologia' },
+  { year: -230000000, evento: 'Primers dinosaures', datoCurioso: 'Eren petits i bípedes, molt diferents dels gegants posteriors.', cat: 'biologia' },
+  { year: -252000000, evento: 'La Gran Mortandat', datoCurioso: 'La major extinció massiva: va morir prop del 90% de les espècies marines.', cat: 'geologia' },
+  { year: -375000000, evento: 'Vertebrats a terra', datoCurioso: 'Peixos amb aletes robustes (com Tiktaalik) comencen a sortir de l\'aigua.', cat: 'biologia' },
+  { year: -440000000, evento: 'Primeres plantes terrestres', datoCurioso: 'Molses i hepàtiques van ser les primeres a colonitzar la terra.', cat: 'biologia' },
+  { year: -530000000, evento: 'Primers peixos', datoCurioso: 'Els primers vertebrats apareixen als mars del Cambrià.', cat: 'biologia' },
+  { year: -541000000, evento: 'Explosió Cambriana', datoCurioso: 'En pocs milions d\'anys sorgeix la majoria dels grans grups animals.', cat: 'biologia' },
+  { year: -2500000000, evento: 'Gran Oxidació', datoCurioso: 'Els cianobacteris van omplir l\'atmosfera d\'oxigen, canviant la Terra.', cat: 'geologia' },
+  { year: -3700000000, evento: 'Primers indicis de vida', datoCurioso: 'Són els rastres més antics de vida microbiana que es coneixen.', cat: 'biologia' },
+  { year: -4000000000, evento: 'Formació dels oceans', datoCurioso: 'L\'aigua va arribar a la Terra mitjançant asteroides i cometes.', cat: 'geologia' },
+  { year: -4600000000, evento: 'Formació de la Terra', datoCurioso: 'Es va formar a partir del disc de pols i gas que envoltava el jove Sol.', cat: 'geologia' },
+  // --- Nous esdeveniments ---
+  { year: -2400000, evento: 'Apareix el gènere Homo', datoCurioso: 'Homo habilis és el primer a fabricar eines de pedra de forma sistemàtica.', cat: 'prehistoria' },
+  { year: -1900000, evento: 'Homo erectus surt d\'Àfrica', datoCurioso: 'Va ser la primera espècie humana a recórrer distàncies tan llargues, arribant fins a Àsia.', cat: 'prehistoria' },
+  { year: -430000, evento: 'Fòssils de neandertal a Atapuerca', datoCurioso: 'Es van trobar a la Sima de los Huesos (Espanya), un jaciment únic al món.', cat: 'prehistoria' },
+  { year: -170000, evento: '«Eva mitocondrial» estimada', datoCurioso: 'És l\'avantpassada comuna més recent de la qual descendeixen tots els humans vius per línia materna.', cat: 'biologia' },
+  { year: -74000, evento: 'Erupció del supervolcà Toba', datoCurioso: 'Alguns estudis suggereixen que va reduir dràsticament la població humana mundial.', cat: 'geologia' },
+  { year: -50000, evento: 'Primers instruments musicals', datoCurioso: 'Flautes tallades en ossos d\'au i ivori de mamut.', cat: 'prehistoria' },
+  { year: -30000, evento: 'Última població de neandertals', datoCurioso: 'Es van extingir poc després de conviure milers d\'anys amb l\'Homo sapiens.', cat: 'prehistoria' },
+  { year: -20000, evento: 'Punt màxim de l\'última glaciació', datoCurioso: 'Gran part d\'Europa i Nord-amèrica estava coberta per gruixudes capes de gel.', cat: 'geologia' },
+  { year: -17000, evento: 'Pintures de Lascaux', datoCurioso: 'Es van descobrir per casualitat el 1940, gràcies a un gos que va caure a la cova.', cat: 'prehistoria' },
+  { year: -9500, evento: 'Göbekli Tepe', datoCurioso: 'El temple monumental més antic conegut, construït abans de l\'agricultura.', cat: 'historia' },
+  { year: -5500, evento: 'Invenció de la roda', datoCurioso: 'Es va fer servir primer per a la ceràmica, no per al transport.', cat: 'historia' },
+  // --- Civilitzacions i Edat Mitjana ---
+  { year: -3000, evento: 'Civilització de la vall de l\'Indus', datoCurioso: 'Les seves ciutats tenien sistemes de clavegueram més avançats que moltes ciutats medievals.', cat: 'historia' },
+  { year: -1600, evento: 'Dinastia Shang a la Xina', datoCurioso: 'Va deixar els primers textos escrits xinesos, gravats en ossos oraculars.', cat: 'historia' },
+  { year: -1200, evento: 'Civilització olmeca', datoCurioso: 'És la «cultura mare» de Mesoamèrica; va tallar enormes caps de pedra.', cat: 'historia' },
+  { year: -563, evento: 'Neix Buda', datoCurioso: 'El seu ensenyament va donar origen a una de les religions més practicades del món.', cat: 'historia' },
+  { year: -268, evento: 'Emperador Ashoka (Índia)', datoCurioso: 'Després d\'una guerra sagnant, es va convertir al budisme i va renunciar a noves conquestes.', cat: 'historia' },
+  { year: 100, evento: 'Auge de Teotihuacan', datoCurioso: 'Va arribar a tenir més de 100.000 habitants, una de les ciutats més grans del món en la seva època.', cat: 'historia' },
+  { year: 868, evento: 'Primer llibre imprès conegut', datoCurioso: 'El Sutra del Diamant, imprès a la Xina amb blocs de fusta.', cat: 'historia' },
+  { year: 1206, evento: 'Genguis Khan funda l\'Imperi mongol', datoCurioso: 'Va arribar a ser l\'imperi de territori continu més extens de la història.', cat: 'historia' },
+  { year: 1324, evento: 'Pelegrinatge de Mansa Musa a la Meca', datoCurioso: 'Va repartir tant d\'or pel camí que en va devaluar el preu a Egipte durant anys.', cat: 'historia' },
+  // --- Edat Moderna i Contemporània ---
+  { year: 1521, evento: 'Caiguda de l\'Imperi asteca', datoCurioso: 'Una aliança de forces espanyoles i indígenes rivals dels asteques va segellar la conquesta.', cat: 'historia' },
+  { year: 1804, evento: 'Independència d\'Haití', datoCurioso: 'La primera república nascuda d\'una revolta de persones esclavitzades.', cat: 'historia' },
+  { year: 1885, evento: 'Conferència de Berlín', datoCurioso: 'Potències europees van repartir Àfrica en un mapa sense participació africana.', cat: 'historia' },
+  { year: 1903, evento: 'Primer vol (germans Wright)', datoCurioso: 'Va durar només 12 segons i va recórrer menys que la llargada d\'un avió actual.', cat: 'historia' },
+  { year: 1917, evento: 'Revolució Russa', datoCurioso: 'Va acabar amb segles de govern tsarista en qüestió de mesos.', cat: 'historia' },
+  { year: 1947, evento: 'Independència de l\'Índia', datoCurioso: 'Va venir acompanyada d\'una partició que va desplaçar milions de persones.', cat: 'historia' },
+  { year: 1957, evento: 'Llançament de l\'Sputnik', datoCurioso: 'Va ser el primer objecte fabricat per humans a orbitar la Terra.', cat: 'historia' },
+  { year: 1994, evento: 'Fi de l\'apartheid a Sud-àfrica', datoCurioso: 'Nelson Mandela, pres 27 anys, va ser elegit president aquell mateix any.', cat: 'historia' },
+].sort((a, b) => b.year - a.year);
+
 let EVENTS = EVENTS_ES;
 
 /* ================================================================
@@ -446,6 +848,129 @@ const ERAS_EN = [
   { nombre: 'Middle Ages', inicio: 476, fin: 1492, tipo: 'historica' },
   { nombre: 'Modern Era', inicio: 1492, fin: 1789, tipo: 'historica' },
   { nombre: 'Contemporary Era', inicio: 1789, fin: CURRENT_YEAR, tipo: 'historica' },
+];
+
+const ERAS_FR = [
+  // Ères géologiques
+  { nombre: 'Hadéen', inicio: -4600000000, fin: -4000000000, tipo: 'geologica' },
+  { nombre: 'Archéen', inicio: -4000000000, fin: -2500000000, tipo: 'geologica' },
+  { nombre: 'Protérozoïque', inicio: -2500000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Précambrien', inicio: -4600000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Paléozoïque', inicio: -541000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Cambrien', inicio: -541000000, fin: -485000000, tipo: 'geologica' },
+  { nombre: 'Ordovicien', inicio: -485000000, fin: -444000000, tipo: 'geologica' },
+  { nombre: 'Silurien', inicio: -444000000, fin: -419000000, tipo: 'geologica' },
+  { nombre: 'Dévonien', inicio: -419000000, fin: -359000000, tipo: 'geologica' },
+  { nombre: 'Carbonifère', inicio: -359000000, fin: -299000000, tipo: 'geologica' },
+  { nombre: 'Permien', inicio: -299000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Mésozoïque', inicio: -252000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Trias', inicio: -252000000, fin: -201000000, tipo: 'geologica' },
+  { nombre: 'Jurassique', inicio: -201000000, fin: -145000000, tipo: 'geologica' },
+  { nombre: 'Crétacé', inicio: -145000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Cénozoïque', inicio: -66000000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Paléogène', inicio: -66000000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Paléocène', inicio: -66000000, fin: -56000000, tipo: 'geologica' },
+  { nombre: 'Éocène', inicio: -56000000, fin: -33900000, tipo: 'geologica' },
+  { nombre: 'Oligocène', inicio: -33900000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Néogène', inicio: -23000000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Miocène', inicio: -23000000, fin: -5300000, tipo: 'geologica' },
+  { nombre: 'Pliocène', inicio: -5300000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Quaternaire', inicio: -2580000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Pléistocène', inicio: -2580000, fin: -11700, tipo: 'geologica' },
+  { nombre: 'Holocène', inicio: -11700, fin: CURRENT_YEAR, tipo: 'geologica' },
+  // Âges historiques
+  { nombre: 'Âge de la pierre', inicio: -3300000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Paléolithique', inicio: -3300000, fin: -10000, tipo: 'historica' },
+  { nombre: 'Mésolithique', inicio: -10000, fin: -8000, tipo: 'historica' },
+  { nombre: 'Néolithique', inicio: -8000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Âge du bronze', inicio: -3300, fin: -1200, tipo: 'historica' },
+  { nombre: 'Âge du fer', inicio: -1200, fin: -1, tipo: 'historica' },
+  { nombre: 'Antiquité', inicio: -3000, fin: 476, tipo: 'historica' },
+  { nombre: 'Moyen Âge', inicio: 476, fin: 1492, tipo: 'historica' },
+  { nombre: 'Époque moderne', inicio: 1492, fin: 1789, tipo: 'historica' },
+  { nombre: 'Époque contemporaine', inicio: 1789, fin: CURRENT_YEAR, tipo: 'historica' },
+];
+
+const ERAS_IT = [
+  // Ere geologiche
+  { nombre: 'Adeano', inicio: -4600000000, fin: -4000000000, tipo: 'geologica' },
+  { nombre: 'Archeano', inicio: -4000000000, fin: -2500000000, tipo: 'geologica' },
+  { nombre: 'Proterozoico', inicio: -2500000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Precambriano', inicio: -4600000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Paleozoico', inicio: -541000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Cambriano', inicio: -541000000, fin: -485000000, tipo: 'geologica' },
+  { nombre: 'Ordoviciano', inicio: -485000000, fin: -444000000, tipo: 'geologica' },
+  { nombre: 'Siluriano', inicio: -444000000, fin: -419000000, tipo: 'geologica' },
+  { nombre: 'Devoniano', inicio: -419000000, fin: -359000000, tipo: 'geologica' },
+  { nombre: 'Carbonifero', inicio: -359000000, fin: -299000000, tipo: 'geologica' },
+  { nombre: 'Permiano', inicio: -299000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Mesozoico', inicio: -252000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Triassico', inicio: -252000000, fin: -201000000, tipo: 'geologica' },
+  { nombre: 'Giurassico', inicio: -201000000, fin: -145000000, tipo: 'geologica' },
+  { nombre: 'Cretaceo', inicio: -145000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Cenozoico', inicio: -66000000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Paleogene', inicio: -66000000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Paleocene', inicio: -66000000, fin: -56000000, tipo: 'geologica' },
+  { nombre: 'Eocene', inicio: -56000000, fin: -33900000, tipo: 'geologica' },
+  { nombre: 'Oligocene', inicio: -33900000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Neogene', inicio: -23000000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Miocene', inicio: -23000000, fin: -5300000, tipo: 'geologica' },
+  { nombre: 'Pliocene', inicio: -5300000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Quaternario', inicio: -2580000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Pleistocene', inicio: -2580000, fin: -11700, tipo: 'geologica' },
+  { nombre: 'Olocene', inicio: -11700, fin: CURRENT_YEAR, tipo: 'geologica' },
+  // Età storiche
+  { nombre: 'Età della pietra', inicio: -3300000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Paleolitico', inicio: -3300000, fin: -10000, tipo: 'historica' },
+  { nombre: 'Mesolitico', inicio: -10000, fin: -8000, tipo: 'historica' },
+  { nombre: 'Neolitico', inicio: -8000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Età del bronzo', inicio: -3300, fin: -1200, tipo: 'historica' },
+  { nombre: 'Età del ferro', inicio: -1200, fin: -1, tipo: 'historica' },
+  { nombre: 'Età antica', inicio: -3000, fin: 476, tipo: 'historica' },
+  { nombre: 'Medioevo', inicio: 476, fin: 1492, tipo: 'historica' },
+  { nombre: 'Età moderna', inicio: 1492, fin: 1789, tipo: 'historica' },
+  { nombre: 'Età contemporanea', inicio: 1789, fin: CURRENT_YEAR, tipo: 'historica' },
+];
+
+const ERAS_CA = [
+  // Eres geològiques
+  { nombre: 'Hàdic', inicio: -4600000000, fin: -4000000000, tipo: 'geologica' },
+  { nombre: 'Arcaic', inicio: -4000000000, fin: -2500000000, tipo: 'geologica' },
+  { nombre: 'Proterozoic', inicio: -2500000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Precambrià', inicio: -4600000000, fin: -541000000, tipo: 'geologica' },
+  { nombre: 'Paleozoic', inicio: -541000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Cambrià', inicio: -541000000, fin: -485000000, tipo: 'geologica' },
+  { nombre: 'Ordovicià', inicio: -485000000, fin: -444000000, tipo: 'geologica' },
+  { nombre: 'Silurià', inicio: -444000000, fin: -419000000, tipo: 'geologica' },
+  { nombre: 'Devonià', inicio: -419000000, fin: -359000000, tipo: 'geologica' },
+  { nombre: 'Carbonífer', inicio: -359000000, fin: -299000000, tipo: 'geologica' },
+  { nombre: 'Permià', inicio: -299000000, fin: -252000000, tipo: 'geologica' },
+  { nombre: 'Mesozoic', inicio: -252000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Triàsic', inicio: -252000000, fin: -201000000, tipo: 'geologica' },
+  { nombre: 'Juràssic', inicio: -201000000, fin: -145000000, tipo: 'geologica' },
+  { nombre: 'Cretaci', inicio: -145000000, fin: -66000000, tipo: 'geologica' },
+  { nombre: 'Cenozoic', inicio: -66000000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Paleogen', inicio: -66000000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Paleocè', inicio: -66000000, fin: -56000000, tipo: 'geologica' },
+  { nombre: 'Eocè', inicio: -56000000, fin: -33900000, tipo: 'geologica' },
+  { nombre: 'Oligocè', inicio: -33900000, fin: -23000000, tipo: 'geologica' },
+  { nombre: 'Neogen', inicio: -23000000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Miocè', inicio: -23000000, fin: -5300000, tipo: 'geologica' },
+  { nombre: 'Pliocè', inicio: -5300000, fin: -2580000, tipo: 'geologica' },
+  { nombre: 'Quaternari', inicio: -2580000, fin: CURRENT_YEAR, tipo: 'geologica' },
+  { nombre: 'Pleistocè', inicio: -2580000, fin: -11700, tipo: 'geologica' },
+  { nombre: 'Holocè', inicio: -11700, fin: CURRENT_YEAR, tipo: 'geologica' },
+  // Edats històriques
+  { nombre: 'Edat de Pedra', inicio: -3300000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Paleolític', inicio: -3300000, fin: -10000, tipo: 'historica' },
+  { nombre: 'Mesolític', inicio: -10000, fin: -8000, tipo: 'historica' },
+  { nombre: 'Neolític', inicio: -8000, fin: -3300, tipo: 'historica' },
+  { nombre: 'Edat del Bronze', inicio: -3300, fin: -1200, tipo: 'historica' },
+  { nombre: 'Edat del Ferro', inicio: -1200, fin: -1, tipo: 'historica' },
+  { nombre: 'Edat Antiga', inicio: -3000, fin: 476, tipo: 'historica' },
+  { nombre: 'Edat Mitjana', inicio: 476, fin: 1492, tipo: 'historica' },
+  { nombre: 'Edat Moderna', inicio: 1492, fin: 1789, tipo: 'historica' },
+  { nombre: 'Edat Contemporània', inicio: 1789, fin: CURRENT_YEAR, tipo: 'historica' },
 ];
 
 let ERAS = ERAS_ES;
@@ -807,9 +1332,44 @@ function showEraBand(era) {
   eraBandLabel.textContent = era.nombre;
   activeEraName = era.nombre;
 
-  factYearEl.textContent = 'Etapa Histórica/Geológica';
+  const stageTitles = {
+    es: 'Etapa Histórica/Geológica',
+    en: 'Historical/Geological Stage',
+    fr: 'Étape Historique/Géologique',
+    it: 'Tappa Storica/Geologica',
+    ca: 'Etapa Històrica/Geològica'
+  };
+  const presentText = {
+    es: 'la actualidad',
+    en: 'the present',
+    fr: 'le présent',
+    it: 'il presente',
+    ca: "l'actualitat"
+  };
+  const startText = {
+    es: 'Empieza aprox. en',
+    en: 'Begins approx. in',
+    fr: 'Commence environ en',
+    it: 'Inizia circa nel',
+    ca: 'Comença aprox. el'
+  };
+  const endText = {
+    es: 'y termina en',
+    en: 'and ends in',
+    fr: 'et se termine en',
+    it: 'e termina nel',
+    ca: 'i acaba el'
+  };
+
+  const lang = currentLang || 'es';
+  const header = stageTitles[lang] || stageTitles.es;
+  const start = startText[lang] || startText.es;
+  const end = endText[lang] || endText.es;
+  const present = presentText[lang] || presentText.es;
+
+  factYearEl.textContent = header;
   factTitleEl.textContent = era.nombre;
-  factTextEl.textContent = `Empieza aprox. en ${formatYear(era.inicio)} y termina en ${era.fin === CURRENT_YEAR ? 'la actualidad' : formatYear(era.fin)}.`;
+  factTextEl.textContent = `${start} ${formatYear(era.inicio)} ${end} ${era.fin === CURRENT_YEAR ? present : formatYear(era.fin)}.`;
   factCard.hidden = false;
   eraClearBtn.hidden = false;
 
@@ -1073,7 +1633,19 @@ function renderSearchResults(results) {
     
     const isEra = res.type === 'era';
     const title = isEra ? res.data.nombre : res.data.evento;
-    const desc = isEra ? `Era ${res.data.tipo}` : formatYear(res.data.year);
+    
+    let desc = formatYear(res.data.year);
+    if (isEra) {
+      const eraTypeLabels = {
+        es: { geologica: 'Era geológica', historica: 'Edad histórica' },
+        en: { geologica: 'Geological era', historica: 'Historical age' },
+        fr: { geologica: 'Ère géologique', historica: 'Âge historique' },
+        it: { geologica: 'Era geologica', historica: 'Età storica' },
+        ca: { geologica: 'Era geològica', historica: 'Edat històrica' }
+      };
+      const l = eraTypeLabels[currentLang] || eraTypeLabels.es;
+      desc = l[res.data.tipo] || `Era ${res.data.tipo}`;
+    }
     
     btn.innerHTML = `<strong>${title}</strong><span>${desc}</span>`;
     
@@ -1231,13 +1803,51 @@ settingsPanelClose.addEventListener('click', closeSettingsPanel);
 
 let currentLang = localStorage.getItem('escala-tiempo-lang') || 'es';
 
+const landingLangToggle = document.getElementById('landingLangToggle');
+const landingLangDropdown = document.getElementById('landingLangDropdown');
+
+if (landingLangToggle && landingLangDropdown) {
+  landingLangToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    landingLangDropdown.hidden = !landingLangDropdown.hidden;
+  });
+
+  document.querySelectorAll('.floating-lang-opt').forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setLanguage(opt.dataset.lang);
+      landingLangDropdown.hidden = true;
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#landingLangWrapper')) {
+      landingLangDropdown.hidden = true;
+    }
+  });
+}
+
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('escala-tiempo-lang', lang);
   htmlEl.lang = lang;
 
-  EVENTS = lang === 'en' ? EVENTS_EN : EVENTS_ES;
-  ERAS = lang === 'en' ? ERAS_EN : ERAS_ES;
+  if (lang === 'en') {
+    EVENTS = EVENTS_EN;
+    ERAS = ERAS_EN;
+  } else if (lang === 'fr') {
+    EVENTS = EVENTS_FR;
+    ERAS = ERAS_FR;
+  } else if (lang === 'it') {
+    EVENTS = EVENTS_IT;
+    ERAS = ERAS_IT;
+  } else if (lang === 'ca') {
+    EVENTS = EVENTS_CA;
+    ERAS = ERAS_CA;
+  } else {
+    EVENTS = EVENTS_ES;
+    ERAS = ERAS_ES;
+  }
 
   // Actualizar textos HTML estáticos
   document.querySelectorAll(`[data-i18n-${lang}]`).forEach(el => {
@@ -1251,8 +1861,18 @@ function setLanguage(lang) {
     lucide.createIcons();
   }
 
+  // Actualizar botones de idioma en Ajustes
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
+  });
+
+  // Actualizar selector flotante de idioma en la landing
+  const landingLangCode = document.getElementById('landingLangCode');
+  if (landingLangCode) {
+    landingLangCode.textContent = lang.toUpperCase();
+  }
+  document.querySelectorAll('.floating-lang-opt').forEach(opt => {
+    opt.classList.toggle('is-active', opt.dataset.lang === lang);
   });
 
   // Re-renderizar todo

@@ -442,11 +442,17 @@ html[data-theme="light"] .theme-icon--moon{ display: inline; }
 .app-title__mark{ color: var(--accent); }
 .app-subtitle{ font-size: 13px; color: var(--text-faint); font-weight: 500; }
 
-.floating-theme-toggle {
+.floating-controls {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.floating-theme-toggle {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -465,6 +471,79 @@ html[data-theme="light"] .theme-icon--moon{ display: inline; }
 }
 .floating-theme-toggle:hover { background: var(--glass-fill-strong); transform: scale(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
 .floating-theme-toggle:active { transform: scale(0.9); }
+
+.floating-lang-wrapper {
+  position: relative;
+}
+
+.floating-lang-toggle {
+  width: auto;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 22px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.floating-lang-toggle .lang-icon {
+  font-size: 16px;
+}
+
+.floating-lang-toggle .lang-code {
+  letter-spacing: 0.5px;
+  font-family: var(--font-display);
+}
+
+.floating-lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--glass-fill-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  z-index: 101;
+}
+
+.floating-lang-dropdown[hidden] {
+  display: none;
+}
+
+.floating-lang-opt {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.floating-lang-opt:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.floating-lang-opt.is-active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
 
 .floating-settings-toggle {
   position: fixed;
@@ -1004,19 +1083,23 @@ html[data-orientation="horizontal"] body.is-presenter-mode .fact-card {
 }
 .lang-toggle {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 .lang-btn {
-  flex: 1;
+  flex: 1 1 calc(33.33% - 0.5rem);
+  min-width: 80px;
+  text-align: center;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-dim);
-  padding: 0.75rem;
+  padding: 0.6rem 0.5rem;
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
   font-weight: 500;
+  font-size: 0.85rem;
 }
 .lang-btn:hover {
   background: rgba(255, 255, 255, 0.1);
