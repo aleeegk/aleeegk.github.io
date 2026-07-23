@@ -103,7 +103,7 @@ const EVENTS_ES = [
   // --- Siglo XXI ---
   { year: 2024, evento: 'Auge de la IA generativa', datoCurioso: 'ChatGPT alcanzó 100 millones de usuarios en solo 2 meses.', cat: 'historia' },
   { year: 2020, evento: 'Pandemia de COVID-19', datoCurioso: 'La OMS la declaró pandemia global el 11 de marzo de 2020.', cat: 'biologia' },
-  { year: 2012, evento: 'Descubrimiento del bosón de Higgs', datoCurioso: 'Peter Higgs predijo su existencia en 1964, casi 50 años antes de confirmarse.', cat: 'historia' },
+  { year: 2012, evento: 'Descubrimiento del bosón de Higgs', datoCurioso: 'Peter Higgs predijo su existencia en 1964, casi 50 años antes de confirmarse.', cat: 'historia', contexto: 'Es una partícula subatómica que explica por qué las demás partículas tienen masa; sin ella, la materia tal como la conocemos no existiría.' },
   { year: 2007, evento: 'Se presenta el iPhone', datoCurioso: 'Steve Jobs lo describió como "un iPod, un teléfono e Internet".', cat: 'historia' },
   { year: 2001, evento: 'Atentados del 11 de septiembre', datoCurioso: 'Las Torres Gemelas tardaron 7 años en construirse y 102 minutos en caer.', cat: 'historia' },
 
@@ -114,26 +114,26 @@ const EVENTS_ES = [
   { year: 1977, evento: 'Se lanza la sonda Voyager 1', datoCurioso: 'Sigue enviando datos desde el espacio interestelar a más de 24.000 millones de km.', cat: 'geologia' },
   { year: 1969, evento: 'Llegada a la Luna', datoCurioso: 'El ordenador del Apolo 11 tenía menos potencia que una calculadora actual.', cat: 'geologia' },
   { year: 1961, evento: 'Yuri Gagarin en el espacio', datoCurioso: 'El vuelo duró solo 108 minutos y dio una sola órbita a la Tierra.', cat: 'historia' },
-  { year: 1953, evento: 'Estructura del ADN', datoCurioso: 'La foto clave (Foto 51) fue tomada por Rosalind Franklin.', cat: 'biologia' },
+  { year: 1953, evento: 'Estructura del ADN', datoCurioso: 'La foto clave (Foto 51) fue tomada por Rosalind Franklin.', cat: 'biologia', contexto: 'Es la molécula que contiene las instrucciones genéticas necesarias para el desarrollo y funcionamiento de todos los seres vivos.' },
   { year: 1945, evento: 'Fin de la Segunda Guerra Mundial', datoCurioso: 'Ese mismo año se fundó la ONU, con 51 países miembros.', cat: 'historia' },
   { year: 1939, evento: 'Inicio Segunda Guerra Mundial', datoCurioso: 'El conflicto más mortífero de la historia: entre 70 y 85 millones de muertos.', cat: 'historia' },
-  { year: 1928, evento: 'Descubrimiento de la penicilina', datoCurioso: 'Alexander Fleming lo encontró por accidente en un cultivo olvidado.', cat: 'biologia' },
+  { year: 1928, evento: 'Descubrimiento de la penicilina', datoCurioso: 'Alexander Fleming lo encontró por accidente en un cultivo olvidado.', cat: 'biologia', contexto: 'Fue el primer antibiótico eficaz de la historia, capaz de curar infecciones bacterianas antes mortales.' },
   { year: 1914, evento: 'Inicio Primera Guerra Mundial', datoCurioso: 'El asesinato de un archiduque desencadenó un conflicto entre 30 naciones.', cat: 'historia' },
   { year: 1903, evento: 'Primer vuelo (hermanos Wright)', datoCurioso: 'Duró solo 12 segundos y recorrió 37 metros.', cat: 'historia' },
 
   // --- Siglo XIX ---
   { year: 1889, evento: 'Torre Eiffel', datoCurioso: 'Se construyó como entrada temporal para la Exposición Universal de París.', cat: 'historia' },
   { year: 1876, evento: 'Teléfono', datoCurioso: 'Elisha Gray presentó una patente similar el mismo día, solo unas horas después.', cat: 'historia' },
-  { year: 1869, evento: 'Tabla periódica de Mendeléyev', datoCurioso: 'Predijo la existencia de elementos aún no descubiertos y acertó.', cat: 'historia' },
-  { year: 1859, evento: 'Publicación de "El origen de las especies"', datoCurioso: 'Se agotó el primer día de venta.', cat: 'biologia' },
+  { year: 1869, evento: 'Tabla periódica de Mendeléyev', datoCurioso: 'Predijo la existencia de elementos aún no descubiertos y acertó.', cat: 'historia', contexto: 'Es un sistema para clasificar y organizar todos los elementos químicos según sus propiedades y masa atómica.' },
+  { year: 1859, evento: 'Publicación de "El origen de las especies"', datoCurioso: 'Se agotó el primer día de venta.', cat: 'biologia', contexto: 'Obra donde Darwin expuso la teoría de la evolución por selección natural de las especies.' },
   { year: 1804, evento: 'Napoleón emperador', datoCurioso: 'Se coronó a sí mismo, quitando la corona de las manos del Papa.', cat: 'historia' },
 
   // --- Siglos XVI a XVIII ---
   { year: 1789, evento: 'Revolución Francesa', datoCurioso: 'El calendario revolucionario llegó a tener semanas de 10 días.', cat: 'historia' },
   { year: 1776, evento: 'Independencia de EEUU', datoCurioso: 'Jefferson tardó 17 días en escribir la Declaración.', cat: 'historia' },
-  { year: 1687, evento: 'Leyes de Newton', datoCurioso: 'En "Principia" formula la ley de la gravitación universal.', cat: 'geologia' },
+  { year: 1687, evento: 'Leyes de Newton', datoCurioso: 'En "Principia" formula la ley de la gravitación universal.', cat: 'geologia', contexto: 'Principios físicos que describen el movimiento de los objetos y la fuerza de gravedad que gobierna el universo.' },
   { year: 1608, evento: 'Telescopio', datoCurioso: 'Galileo lo mejoró un año después y lo apuntó al cielo.', cat: 'historia' },
-  { year: 1543, evento: 'Revolución Copernicana', datoCurioso: 'El libro afirmando que la Tierra gira alrededor del Sol se publicó el año de su muerte.', cat: 'geologia' },
+  { year: 1543, evento: 'Revolución Copernicana', datoCurioso: 'El libro afirmando que la Tierra gira alrededor del Sol se publicó el año de su muerte.', cat: 'geologia', contexto: 'Demostró que la Tierra y los demás planetas giran alrededor del Sol y no al revés.' },
   { year: 1492, evento: 'Llegada a América', datoCurioso: 'Colón murió convencido de que había llegado a Asia.', cat: 'historia' },
   { year: 1440, evento: 'Imprenta (Gutenberg)', datoCurioso: 'Su primera gran obra fue la Biblia de 42 líneas.', cat: 'historia' },
 
@@ -1295,10 +1295,28 @@ function updateActiveNodeAndFact() {
   }
 }
 
+const factContextEl = document.getElementById('factContext');
+
 function showFact(ev) {
   factYearEl.textContent = formatYear(ev.year);
   factTitleEl.textContent = ev.evento;
   factTextEl.textContent = ev.datoCurioso;
+
+  if (ev && ev.contexto) {
+    const labels = {
+      es: 'En pocas palabras:',
+      en: 'In simple terms:',
+      fr: 'En résumé :',
+      it: 'In poche parole:',
+      ca: 'En poques paraules:'
+    };
+    const label = labels[currentLang] || labels.es;
+    factContextEl.innerHTML = `<span class="fact-card__context-label">${label}</span>${ev.contexto}`;
+    factContextEl.hidden = false;
+  } else {
+    factContextEl.hidden = true;
+  }
+
   factCard.hidden = false;
 }
 function hideFact() {
@@ -1903,3 +1921,191 @@ setTimeout(() => document.body.classList.add('is-ready'), 50);
 if (window.lucide) {
   lucide.createIcons();
 }
+
+/* ================================================================
+   MODO QUIZ
+   ================================================================ */
+const quizModal = document.getElementById('quizModal');
+const quizToggle = document.getElementById('quizToggle');
+const quizModalClose = document.getElementById('quizModalClose');
+const quizModalCloseBackdrop = document.getElementById('quizModalCloseBackdrop');
+const quizScoreCount = document.getElementById('quizScoreCount');
+const quizQuestionText = document.getElementById('quizQuestionText');
+const quizOptionsGrid = document.getElementById('quizOptionsGrid');
+const quizExplanationBox = document.getElementById('quizExplanationBox');
+const quizResultBadge = document.getElementById('quizResultBadge');
+const quizExplanationText = document.getElementById('quizExplanationText');
+const quizNextBtn = document.getElementById('quizNextBtn');
+
+let quizScore = { correct: 0, total: 0 };
+let currentQuizEvent = null;
+let quizHasAnswered = false;
+
+function openQuizModal() {
+  quizScore = { correct: 0, total: 0 };
+  updateQuizScore();
+  loadNextQuizQuestion();
+  quizModal.hidden = false;
+}
+
+function closeQuizModal() {
+  quizModal.hidden = true;
+}
+
+function updateQuizScore() {
+  if (quizScoreCount) {
+    quizScoreCount.textContent = `${quizScore.correct}/${quizScore.total}`;
+  }
+}
+
+function loadNextQuizQuestion() {
+  quizHasAnswered = false;
+  if (quizExplanationBox) quizExplanationBox.hidden = true;
+  if (quizNextBtn) quizNextBtn.hidden = true;
+  if (quizOptionsGrid) quizOptionsGrid.innerHTML = '';
+
+  const activeEvents = EVENTS.filter(e => e.evento && typeof e.year === 'number');
+  if (activeEvents.length < 4) return;
+
+  currentQuizEvent = activeEvents[Math.floor(Math.random() * activeEvents.length)];
+
+  const questionPrompts = {
+    es: `¿En qué año ocurrió: "${currentQuizEvent.evento}"?`,
+    en: `In which year did "${currentQuizEvent.evento}" occur?`,
+    fr: `En quelle année a eu lieu : "${currentQuizEvent.evento}" ?`,
+    it: `In quale anno è avvenuto: "${currentQuizEvent.evento}"?`,
+    ca: `En quin any va ocórrer: "${currentQuizEvent.evento}"?`
+  };
+
+  if (quizQuestionText) {
+    quizQuestionText.textContent = questionPrompts[currentLang] || questionPrompts.es;
+  }
+
+  // Obtener distractores de otros eventos
+  const otherYears = Array.from(new Set(activeEvents.map(e => e.year)))
+    .filter(y => y !== currentQuizEvent.year);
+
+  // Mezclar distractores
+  otherYears.sort(() => Math.random() - 0.5);
+  const distractors = otherYears.slice(0, 3);
+  const options = [currentQuizEvent.year, ...distractors];
+  options.sort(() => Math.random() - 0.5);
+
+  options.forEach(year => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt-btn';
+    btn.textContent = formatYear(year);
+    btn.addEventListener('click', () => handleQuizAnswer(year, btn, currentQuizEvent.year));
+    quizOptionsGrid.appendChild(btn);
+  });
+}
+
+function handleQuizAnswer(selectedYear, selectedBtn, correctYear) {
+  if (quizHasAnswered) return;
+  quizHasAnswered = true;
+  quizScore.total++;
+
+  const isCorrect = selectedYear === correctYear;
+  if (isCorrect) quizScore.correct++;
+  updateQuizScore();
+
+  document.querySelectorAll('.quiz-opt-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === formatYear(correctYear)) {
+      btn.classList.add('is-correct');
+    }
+  });
+
+  if (!isCorrect) {
+    selectedBtn.classList.add('is-wrong');
+  }
+
+  const badgeLabels = {
+    es: { correct: '¡Correcto!', wrong: 'Incorrecto' },
+    en: { correct: 'Correct!', wrong: 'Incorrect' },
+    fr: { correct: 'Correct !', wrong: 'Incorrect' },
+    it: { correct: 'Corretto!', wrong: 'Errato' },
+    ca: { correct: 'Correcte!', wrong: 'Incorrecte' }
+  };
+  const b = badgeLabels[currentLang] || badgeLabels.es;
+
+  if (quizResultBadge) {
+    quizResultBadge.textContent = isCorrect ? b.correct : b.wrong;
+    quizResultBadge.className = `quiz-explanation__badge ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+  }
+  if (quizExplanationText) {
+    quizExplanationText.textContent = currentQuizEvent.datoCurioso;
+  }
+  if (quizExplanationBox) quizExplanationBox.hidden = false;
+  if (quizNextBtn) quizNextBtn.hidden = false;
+}
+
+if (quizToggle) quizToggle.addEventListener('click', openQuizModal);
+if (quizModalClose) quizModalClose.addEventListener('click', closeQuizModal);
+if (quizModalCloseBackdrop) quizModalCloseBackdrop.addEventListener('click', closeQuizModal);
+if (quizNextBtn) quizNextBtn.addEventListener('click', loadNextQuizQuestion);
+
+/* ================================================================
+   REGISTRO PWA SERVICE WORKER Y BOTÓN DE DESCARGA
+   ================================================================ */
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(err => {
+      console.log('Error registrando ServiceWorker:', err);
+    });
+  });
+}
+
+const downloadAppBtn = document.getElementById('downloadAppBtn');
+const downloadBtnText = document.getElementById('downloadBtnText');
+
+if (downloadAppBtn) {
+  downloadAppBtn.addEventListener('click', async () => {
+    // 1. Si el navegador ofrece el prompt nativo de instalación, activarlo
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+      }
+    }
+
+    // 2. Guardar explícitamente en caché la aplicación completa
+    if ('caches' in window) {
+      try {
+        const cache = await caches.open('escala-tiempo-v1');
+        await cache.addAll([
+          './',
+          './index.html',
+          './styles.css',
+          './script.js',
+          './manifest.json',
+          './icon-192.png',
+          './icon-512.png'
+        ]);
+      } catch (err) {
+        console.log('Caché guardada parcialmente:', err);
+      }
+    }
+
+    // 3. Feedback visual
+    const downloadedText = {
+      es: '✓ Página guardada para uso sin conexión',
+      en: '✓ Page saved for offline use',
+      fr: '✓ Page enregistrée hors-ligne',
+      it: '✓ Pagina salvata per uso offline',
+      ca: '✓ Pàgina desada per a ús offline'
+    };
+    if (downloadBtnText) {
+      downloadBtnText.textContent = downloadedText[currentLang] || downloadedText.es;
+    }
+    downloadAppBtn.classList.add('is-downloaded');
+  });
+}
+

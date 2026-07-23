@@ -6,6 +6,8 @@
 <title>Escala del Tiempo</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307070a'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%237fd8ff' stroke-width='2' stroke-linecap='round' opacity='0.4'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%237fd8ff'/%3E%3C/svg%3E">
 <meta name="description" content="Una línea del tiempo interactiva que pone en perspectiva un millón de años de historia, prehistoria y geología en un solo eje visual.">
+<meta name="theme-color" content="#07070a">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -171,6 +173,13 @@
             <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
           </svg>
         </button>
+        <button class="ctrl-btn ctrl-btn--quiz" id="quizToggle" aria-label="Modo Quiz" title="Modo Quiz">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
         <button class="ctrl-btn" id="appSettingsToggle" aria-label="Ajustes" title="Ajustes">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -235,6 +244,7 @@
         </div>
         <div class="fact-card__title" id="factTitle"></div>
         <div class="fact-card__text" id="factText"></div>
+        <div class="fact-card__context" id="factContext" hidden></div>
       </div>
     </div>
 
@@ -297,6 +307,15 @@
           <button class="lang-btn" data-lang="ca">Català</button>
         </div>
       </div>
+
+      <div class="settings-group" style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+        <label data-i18n-es="Uso sin conexión / App" data-i18n-en="Offline / App" data-i18n-fr="Utilisation hors-ligne" data-i18n-it="Uso offline" data-i18n-ca="Ús offline">Uso sin conexión / App</label>
+        <button class="settings-action-btn" id="downloadAppBtn">
+          <i data-lucide="download"></i>
+          <span id="downloadBtnText" data-i18n-es="Descargar / Guardar web completa" data-i18n-en="Download / Save full app" data-i18n-fr="Télécharger l'application" data-i18n-it="Scarica l'applicazione" data-i18n-ca="Descarregar aplicació completa">Descargar / Guardar web completa</span>
+        </button>
+        <p class="settings-hint" id="downloadAppHint" data-i18n-es="Guarda la presentación y la línea de tiempo para usar la página entera sin internet." data-i18n-en="Saves the landing page and timeline for offline use." data-i18n-fr="Enregistre la présentation et la chronologie pour une utilisation hors-ligne." data-i18n-it="Salva la presentazione e la linea del tempo per l'uso senza connessione." data-i18n-ca="Desa la presentació i la línia de temps per a ús sense internet.">Guarda la presentación y la línea de tiempo para usar la página entera sin internet.</p>
+      </div>
     </div>
   </div>
 
@@ -307,6 +326,38 @@
       <h2 data-i18n-es="Resultados de búsqueda" data-i18n-en="Search Results" data-i18n-fr="Résultats de recherche" data-i18n-it="Risultati di ricerca" data-i18n-ca="Resultats de cerca">Resultados de búsqueda</h2>
       <div class="search-results-list" id="searchResultsList">
         <!-- Los resultados se inyectarán aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Modo Quiz (Liquid Glass) -->
+  <div class="settings-panel" id="quizModal" hidden>
+    <div class="settings-panel__backdrop" id="quizModalCloseBackdrop"></div>
+    <div class="settings-panel__content quiz-modal__content">
+      <div class="quiz-modal__header">
+        <div class="quiz-modal__score">
+          <span data-i18n-es="Puntuación:" data-i18n-en="Score:" data-i18n-fr="Score :" data-i18n-it="Punteggio:" data-i18n-ca="Puntuació:">Puntuación:</span>
+          <strong id="quizScoreCount">0/0</strong>
+        </div>
+        <h2 data-i18n-es="Modo Quiz" data-i18n-en="Quiz Mode" data-i18n-fr="Mode Quiz" data-i18n-it="Modalità Quiz" data-i18n-ca="Mode Quiz">Modo Quiz</h2>
+        <button class="eras-panel__close" id="quizModalClose" aria-label="Cerrar modal">×</button>
+      </div>
+
+      <div class="quiz-modal__body">
+        <div class="quiz-question" id="quizQuestionText"></div>
+
+        <div class="quiz-options" id="quizOptionsGrid"></div>
+
+        <div class="quiz-explanation" id="quizExplanationBox" hidden>
+          <div class="quiz-explanation__badge" id="quizResultBadge"></div>
+          <div class="quiz-explanation__text" id="quizExplanationText"></div>
+        </div>
+      </div>
+
+      <div class="quiz-modal__footer">
+        <button class="quiz-next-btn" id="quizNextBtn" hidden>
+          <span data-i18n-es="Siguiente pregunta" data-i18n-en="Next question" data-i18n-fr="Question suivante" data-i18n-it="Prossima domanda" data-i18n-ca="Següent pregunta">Siguiente pregunta</span> →
+        </button>
       </div>
     </div>
   </div>
