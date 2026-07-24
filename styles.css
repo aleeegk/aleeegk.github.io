@@ -90,6 +90,12 @@ html, body{
   transition: background .4s ease, color .4s ease;
 }
 
+/* Fundido de entrada: el body arranca invisible y se revela cuando
+   script.js añade la clase "is-ready" (tras el primer renderizado),
+   para evitar el parpadeo de contenido sin estilos ni posiciones. */
+body{ opacity: 0; }
+body.is-ready{ opacity: 1; transition: opacity .45s ease, background .4s ease, color .4s ease; }
+
 @keyframes bg-breathe {
   0% { transform: scale(1); opacity: 0.95; }
   100% { transform: scale(1.15); opacity: 1; }

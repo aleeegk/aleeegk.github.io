@@ -1,3 +1,5 @@
+🇪🇸 Español | [🇬🇧 English](README.en.md)
+
 # ⏳ Escala del Tiempo | Timeline Scale
 
 > **Un millón de años, una sola línea.**  
@@ -39,11 +41,13 @@ A menudo, la historia humana y la historia de la Tierra se representan por separ
 - **🎨 Diseño "Liquid Glass" & Aesthetica Premium:** Interfaz con estilo glassmorphism moderno, temas claro/oscuro, viñeta dinámica y animaciones de alta fluidez.
 - **🔍 Búsqueda Global e Inteligente:** Encuentra cualquier evento, era geológica o año específico al instante mediante el buscador con filtro de texto y modal de resultados.
 - **📜 Panel de Eras y Etapas:** Desplegable lateral interactivo para saltar rápidamente a las eras geológicas (*Hadeano, Arqueano, Mesozoico, Cenozoico...*) y edades históricas (*Edad Antigua, Media, Moderna, Contemporánea...*).
-- **🌍 Soporte Multilingüe (i18n):** Conmutación instantánea entre **Español** e **Inglés** en toda la interfaz sin necesidad de recargar la página.
+- **🌍 Soporte Multilingüe (i18n):** Conmutación instantánea entre **Español, English, Français, Italiano y Català** en toda la interfaz sin necesidad de recargar la página.
 - **↕️↔️ Orientación Adaptable:** Cambia entre vista vertical u horizontal para ajustarse a cualquier tipo de pantalla o preferencia de navegación.
 - **📽️ Modo Proyector:** Modo de vista limpia y maximizada pensado para exposiciones, aulas de clase y presentaciones.
 - **📱 100% Responsive & Accesible:** Optimizado para dispositivos móviles, tablets y ordenadores de escritorio, compatible con navegación por teclado (flechas ↑/↓).
 - **⚡ Super Ligero:** Construido sin frameworks pesados ni dependencias externas innecesarias para garantizar una carga ultrarrápida.
+- **🧩 Modo Quiz:** Pon a prueba lo aprendido con preguntas aleatorias sobre los hitos históricos, cuatro opciones de respuesta y un contador de aciertos en vivo.
+- **📥 Sin conexión / PWA:** Guarda la aplicación completa para uso sin conexión desde el panel de ajustes — funciona sin internet después de la primera visita.
 
 ---
 
@@ -61,10 +65,15 @@ A menudo, la historia humana y la historia de la Tierra se representan por separ
 ```plaintext
 Escala del tiempo/
 │
-├── index.html        # Estructura principal (Landing, App timeline, Paneles y Modales)
-├── styles.css        # Sistema de diseño, tokens CSS, Glassmorphism, Temas y Responsive
-├── script.js         # Base de datos de hitos, motor de renderizado, cálculo temporal e i18n
-├── README.md         # Documentación del proyecto para GitHub
+├── index.html           # Estructura principal (Landing, App timeline, Paneles y Modales)
+├── styles.css           # Sistema de diseño, tokens CSS, Glassmorphism, Temas y Responsive
+├── script.js            # Base de datos de hitos, motor de renderizado, cálculo temporal e i18n
+├── manifest.json        # Manifiesto PWA (nombre, iconos, color de tema)
+├── service-worker.js    # Service Worker para caché sin conexión
+├── icon-192.png          # Icono PWA 192×192
+├── icon-512.png          # Icono PWA 512×512
+├── README.md             # Documentación del proyecto (Español)
+├── README.en.md          # Documentación del proyecto (English)
 └── google98ba93eee4db0035.html # Archivo de verificación para Google Search Console
 ```
 
