@@ -1296,6 +1296,70 @@ function updateActiveNodeAndFact() {
 }
 
 const factContextEl = document.getElementById('factContext');
+const factCardExpand = document.getElementById('factCardExpand');
+const factCardBackdrop = document.getElementById('factCardBackdrop');
+let isFactCardExpanded = false;
+
+function toggleExpandFactCard() {
+  isFactCardExpanded = !isFactCardExpanded;
+  if (factCard) {
+    factCard.classList.toggle('is-expanded', isFactCardExpanded);
+  }
+  if (factCardBackdrop) {
+    factCardBackdrop.hidden = !isFactCardExpanded;
+  }
+  if (factCardExpand) {
+    const iconExpand = factCardExpand.querySelector('.icon-expand');
+    const iconCompress = factCardExpand.querySelector('.icon-compress');
+    if (iconExpand && iconCompress) {
+      iconExpand.style.display = isFactCardExpanded ? 'none' : 'inline-block';
+      iconCompress.style.display = isFactCardExpanded ? 'inline-block' : 'none';
+    }
+  }
+}
+
+function collapseFactCard() {
+  if (isFactCardExpanded) {
+    isFactCardExpanded = false;
+    if (factCard) factCard.classList.remove('is-expanded');
+    if (factCardBackdrop) factCardBackdrop.hidden = true;
+    if (factCardExpand) {
+      const iconExpand = factCardExpand.querySelector('.icon-expand');
+      const iconCompress = factCardExpand.querySelector('.icon-compress');
+      if (iconExpand && iconCompress) {
+        iconExpand.style.display = 'inline-block';
+        iconCompress.style.display = 'none';
+      }
+    }
+  }
+}
+
+if (factCardClose) {
+  factCardClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideFact();
+    clearEraBand();
+  });
+}
+if (factCardExpand) {
+  factCardExpand.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleExpandFactCard();
+  });
+}
+if (factCardBackdrop) {
+  factCardBackdrop.addEventListener('click', () => {
+    collapseFactCard();
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (isFactCardExpanded) {
+      collapseFactCard();
+    }
+  }
+});
 
 function showFact(ev) {
   factYearEl.textContent = formatYear(ev.year);
@@ -1319,8 +1383,10 @@ function showFact(ev) {
 
   factCard.hidden = false;
 }
+
 function hideFact() {
-  factCard.hidden = true;
+  collapseFactCard();
+  if (factCard) factCard.hidden = true;
 }
 
 /* ================================================================
@@ -1409,7 +1475,6 @@ function jumpToEra(era) {
 }
 
 eraClearBtn.addEventListener('click', () => { clearEraBand(); hideFact(); });
-factCardClose.addEventListener('click', () => { hideFact(); clearEraBand(); });
 
 /* ================================================================
    PANELES Y TOGGLES
@@ -1471,8 +1536,8 @@ function getEventClientCoords(e) {
 }
 
 function handleDragStart(e) {
-  // Ignorar si se toca en botones, inputs, enlaces, dentro del panel de eras o la barra lateral
-  if (e.target.closest('button, input, select, textarea, a, #erasPanel, #settingsPanel, #searchResultsModal, #sideControl, .fact-card__close')) {
+  // Ignorar si se toca en botones, inputs, enlaces, dentro del panel de eras, la barra lateral o la tarjeta de dato curioso
+  if (e.target.closest('button, input, select, textarea, a, #erasPanel, #settingsPanel, #searchResultsModal, #sideControl, .fact-card, .fact-card-backdrop')) {
     return;
   }
 
@@ -1963,6 +2028,8 @@ function loadNextQuizQuestion() {
   if (quizExplanationBox) quizExplanationBox.hidden = true;
   if (quizNextBtn) quizNextBtn.hidden = true;
   if (quizOptionsGrid) quizOptionsGrid.innerHTML = '';
+  const quizBody = document.querySelector('.quiz-modal__body');
+  if (quizBody) quizBody.scrollTop = 0;
 
   const activeEvents = EVENTS.filter(e => e.evento && typeof e.year === 'number');
   if (activeEvents.length < 4) return;
@@ -2036,7 +2103,12 @@ function handleQuizAnswer(selectedYear, selectedBtn, correctYear) {
   if (quizExplanationText) {
     quizExplanationText.textContent = currentQuizEvent.datoCurioso;
   }
-  if (quizExplanationBox) quizExplanationBox.hidden = false;
+  if (quizExplanationBox) {
+    quizExplanationBox.hidden = false;
+    setTimeout(() => {
+      quizExplanationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  }
   if (quizNextBtn) quizNextBtn.hidden = false;
 }
 
