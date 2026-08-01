@@ -469,10 +469,17 @@ html[data-theme="light"] .support__btn--github {
   inset: 0;
   z-index: 1;
   opacity: 1;
-  transition: opacity .45s ease;
+  transition: opacity .45s ease, transform .38s cubic-bezier(.4, 0, .2, 1), filter .38s cubic-bezier(.4, 0, .2, 1);
+  transform-origin: 50% 50%;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.app-view.is-time-warping {
+  transform: scale(0.82);
+  filter: blur(14px) brightness(0.5) saturate(1.4);
+  pointer-events: none;
 }
 
 .app-view[hidden] {
@@ -1869,16 +1876,20 @@ html[data-theme="light"] .lang-btn.is-active {
    ================================================================ */
 .search-results-content {
   max-width: 90vw;
-  width: 450px;
+  width: 520px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
 }
 
+.search-results-content h2 {
+  font-size: 1.4rem;
+}
+
 .search-results-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   overflow-y: auto;
   padding-right: 0.5rem;
   margin-right: -0.5rem;
@@ -1902,15 +1913,17 @@ html[data-theme="light"] .search-results-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text);
-  padding: 1rem;
+  padding: 0.9rem 1.1rem;
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
   text-align: left;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .search-result-btn:hover {
@@ -1921,17 +1934,21 @@ html[data-theme="light"] .search-results-list::-webkit-scrollbar-thumb {
 
 .search-result-btn strong {
   font-weight: 600;
-  font-size: 1rem;
-  color: var(--accent);
+  font-size: 1.02rem;
+  color: var(--text);
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .search-result-btn span {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Light Theme overrides for search buttons */
@@ -2306,4 +2323,81 @@ html[data-theme="light"] .quiz-modal__body::-webkit-scrollbar-thumb {
   color: var(--text-faint);
   margin-top: 6px;
   line-height: 1.35;
+}
+/* ============================================================
+   MOTION UPGRADE
+   ------------------------------------------------------------
+   Revelado circular (View Transitions API) para tema y para
+   pasar de presentacion a app; scroll-reveal en la landing;
+   micro-interacciones magnetica/tilt; y el arreglo de los
+   modales (ajustes, busqueda, quiz) que aparecian de golpe sin
+   transicion. Todo respeta prefers-reduced-motion al final.
+   ============================================================ */
+
+::view-transition-old(root){ animation: none; }
+::view-transition-new(root){
+  animation: vt-circle-reveal .65s cubic-bezier(.22,.9,.4,1) forwards;
+  clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
+}
+@keyframes vt-circle-reveal{
+  to{ clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%)); }
+}
+
+.reveal-on-scroll{
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .6s cubic-bezier(.22,.9,.4,1) var(--reveal-delay, 0s),
+              transform .6s cubic-bezier(.22,.9,.4,1) var(--reveal-delay, 0s);
+}
+.reveal-on-scroll.is-visible{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.landing__cta{
+  transition: background .2s ease, transform .18s cubic-bezier(.22,.9,.4,1), box-shadow .2s ease;
+}
+
+.fact-card__inner,
+.concept-card{
+  transition: transform .25s cubic-bezier(.22,.9,.4,1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* --- Arreglo de los modales que aparecian de golpe (settings,
+   busqueda, quiz comparten la clase .settings-panel): en vez de
+   depender solo de display:none/flex (que no se puede animar), se
+   mantienen en el flujo con opacidad 0 mientras estan "hidden", y
+   se desvanecen con un ligero acercamiento de escala al abrirse. */
+.settings-panel[hidden]{
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+}
+.settings-panel{
+  opacity: 1;
+  transition: opacity .25s ease;
+}
+.settings-panel__content{
+  transition: transform .3s cubic-bezier(.22,.9,.4,1.05), opacity .25s ease;
+}
+.settings-panel[hidden] .settings-panel__content{
+  transform: scale(0.94) translateY(10px);
+  opacity: 0;
+}
+.settings-panel:not([hidden]) .settings-panel__content{
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root){ animation: none !important; }
+  .reveal-on-scroll{ opacity: 1 !important; transform: none !important; transition: none !important; }
+  .landing__cta, .fact-card__inner, .concept-card{ transition: none !important; }
+  .settings-panel, .settings-panel__content{ transition: none !important; }
+  .app-view{ transition: opacity .45s ease !important; }
+  .app-view.is-time-warping{ transform: none !important; filter: none !important; }
 }

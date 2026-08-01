@@ -1196,8 +1196,8 @@ function renderEraChips() {
     chip.className = 'era-chip';
     chip.textContent = era.nombre;
     chip.addEventListener('click', () => {
-      jumpToEra(era);
       closeErasPanel();
+      jumpToEra(era);
     });
     if (era.tipo === 'geologica') eraChipsGeo.appendChild(chip);
     else eraChipsHist.appendChild(chip);
@@ -1271,6 +1271,43 @@ function setT(t, animate) {
 
   updateBackgroundGlow(currentT);
   updateActiveNodeAndFact();
+}
+
+/* ================================================================
+   TRANSICIÓN CINEMÁTICA "TIME WARP"
+   Al saltar a un punto lejano del eje (resultado de búsqueda, era o
+   época), en vez de deslizar en línea recta: aleja la cámara con
+   desenfoque, salta de golpe mientras estamos "en el aire", y vuelve
+   a acercarse — el mismo lenguaje visual que el cambio de personaje
+   de GTA V, adaptado a un eje temporal.
+   ================================================================ */
+function timeWarpTo(targetT, onArrive) {
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion) {
+    setT(targetT, true);
+    if (onArrive) onArrive();
+    return;
+  }
+
+  let warped = false;
+  const warpIn = () => {
+    if (warped) return;
+    warped = true;
+    setT(targetT, false);
+    if (onArrive) onArrive();
+    requestAnimationFrame(() => appView.classList.remove('is-time-warping'));
+  };
+
+  appView.addEventListener('transitionend', function onZoomOut(e) {
+    if (e.target !== appView || e.propertyName !== 'transform') return;
+    appView.removeEventListener('transitionend', onZoomOut);
+    warpIn();
+  });
+  // Red de seguridad por si el navegador no dispara transitionend
+  setTimeout(warpIn, 450);
+
+  appView.classList.add('is-time-warping');
 }
 
 const ACTIVE_THRESHOLD_T = 0.006;
@@ -1470,8 +1507,7 @@ function clearEraBand() {
 }
 
 function jumpToEra(era) {
-  setT(yearToT(era.inicio), true);
-  showEraBand(era);
+  timeWarpTo(yearToT(era.inicio), () => showEraBand(era));
 }
 
 eraClearBtn.addEventListener('click', () => { clearEraBand(); hideFact(); });
@@ -1733,16 +1769,17 @@ function renderSearchResults(results) {
     btn.innerHTML = `<strong>${title}</strong><span>${desc}</span>`;
     
     btn.addEventListener('click', () => {
-      if (isEra) {
-        setT(yearToT(res.data.inicio), true);
-        showEraBand(res.data);
-      } else {
-        clearEraBand();
-        setT(yearToT(res.data.year), true);
-      }
+      closeSearchResultsModal();
+      const targetT = isEra ? yearToT(res.data.inicio) : yearToT(res.data.year);
+      timeWarpTo(targetT, () => {
+        if (isEra) {
+          showEraBand(res.data);
+        } else {
+          clearEraBand();
+        }
+      });
       yearInput.value = title;
       yearClearBtn.hidden = false;
-      closeSearchResultsModal();
     });
     
     searchResultsList.appendChild(btn);
@@ -1814,6 +1851,26 @@ yearJumpForm.addEventListener('submit', (e) => {
 const landingView = document.getElementById('landingView');
 const appView = document.getElementById('appView');
 
+/* ----------------------------------------------------------------
+   Revelado circular con la View Transitions API nativa del
+   navegador. Guarda en variables CSS el punto exacto del clic para
+   que el círculo crezca desde ahí. Si el navegador no la soporta,
+   el cambio se hace al instante, sin animación ni error.
+   ---------------------------------------------------------------- */
+function setVTOrigin(e) {
+  const x = e && e.clientX ? e.clientX : window.innerWidth / 2;
+  const y = e && e.clientY ? e.clientY : window.innerHeight / 2;
+  document.documentElement.style.setProperty('--vt-x', x + 'px');
+  document.documentElement.style.setProperty('--vt-y', y + 'px');
+}
+function withViewTransition(updateFn) {
+  if (document.startViewTransition) {
+    document.startViewTransition(updateFn);
+  } else {
+    updateFn();
+  }
+}
+
 function enterApp() {
   appView.hidden = false;
   requestAnimationFrame(() => {
@@ -1821,22 +1878,29 @@ function enterApp() {
     appView.style.opacity = '1';
   });
 }
-document.getElementById('enterAppBtn').addEventListener('click', enterApp);
-document.getElementById('backToLandingBtn').addEventListener('click', () => {
-  landingView.classList.remove('is-hidden');
-  appView.hidden = true;
-  closeErasPanel();
+document.getElementById('enterAppBtn').addEventListener('click', (e) => {
+  setVTOrigin(e);
+  withViewTransition(enterApp);
+});
+document.getElementById('backToLandingBtn').addEventListener('click', (e) => {
+  setVTOrigin(e);
+  withViewTransition(() => {
+    landingView.classList.remove('is-hidden');
+    appView.hidden = true;
+    closeErasPanel();
+  });
 });
 
 // Quick Starts
 document.querySelectorAll('.quick-starts__btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
     const jumpTarget = btn.dataset.jump;
     
     // Simular que el usuario escribió eso en el buscador y lo envió
     yearInput.value = jumpTarget;
     yearJumpForm.dispatchEvent(new Event('submit'));
-    enterApp();
+    setVTOrigin(e);
+    withViewTransition(enterApp);
   });
 });
 
@@ -1864,10 +1928,13 @@ function applyTheme(theme) {
 const savedTheme = localStorage.getItem('escala-tiempo-theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 applyTheme(savedTheme);
 themeToggles.forEach(toggle => {
-  toggle.addEventListener('click', () => {
+  toggle.addEventListener('click', (e) => {
+    setVTOrigin(e);
     const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    applyTheme(next);
-    localStorage.setItem('escala-tiempo-theme', next);
+    withViewTransition(() => {
+      applyTheme(next);
+      localStorage.setItem('escala-tiempo-theme', next);
+    });
   });
 });
 
@@ -2181,3 +2248,61 @@ if (downloadAppBtn) {
   });
 }
 
+
+/* ================================================================
+   MOTION UPGRADE: scroll-reveal + micro-interacciones
+   ================================================================ */
+(function setupScrollReveal() {
+  const items = document.querySelectorAll('.reveal-on-scroll');
+  if (!items.length) return;
+  items.forEach((el, i) => {
+    el.style.setProperty('--reveal-delay', Math.min(i * 0.07, 0.4) + 's');
+  });
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  items.forEach(el => observer.observe(el));
+})();
+
+(function setupMagneticButton() {
+  const btn = document.getElementById('enterAppBtn');
+  if (!btn) return;
+  const strength = 0.25;
+  const maxOffset = 10;
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const relX = e.clientX - (rect.left + rect.width / 2);
+    const relY = e.clientY - (rect.top + rect.height / 2);
+    const x = Math.max(-maxOffset, Math.min(maxOffset, relX * strength));
+    const y = Math.max(-maxOffset, Math.min(maxOffset, relY * strength));
+    btn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+})();
+
+(function setupTiltCards() {
+  const maxTilt = 6;
+  function attachTilt(el) {
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const rotateY = (px - 0.5) * maxTilt * 2;
+      const rotateX = (0.5 - py) * maxTilt * 2;
+      el.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+  }
+  document.querySelectorAll('.concept-card').forEach(attachTilt);
+  const factInner = document.querySelector('.fact-card__inner');
+  if (factInner) attachTilt(factInner);
+})();
